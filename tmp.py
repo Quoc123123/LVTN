@@ -17,14 +17,14 @@ listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 # ******************************************************************************************************************
 # PageOne of UI  
 # ******************************************************************************************************************
-class UI(QMainWindow):
+class UI(QWidget):
     def __init__(self):
         super().__init__()
         
         # *********************************************************
         # Load and setting the default when opening the GUI
         # *********************************************************
-        loadUi('design_ui/Ui.ui', self)
+        loadUi('design_ui/main.ui', self)
         self.setWindowTitle('QuocBrave')
 
         # *********************************************************
@@ -40,10 +40,8 @@ class UI(QMainWindow):
         # setting the visible elements 
         # *********************************************************
         self.groupBoxConnection.setVisible(True)
-        self.groupBoxUserData.setVisible(False) 
-        self.groupBoxImageID.setVisible(False)
-        self.addComPortBaudrate()
-        
+        self.gbxUserData.setVisible(False) 
+        self.gbxImageID.setVisible(False)
 
         # *********************************************************
         # display time and date on UI
@@ -62,19 +60,19 @@ class UI(QMainWindow):
         # **********************************************************
         # For connection
         self.btnConnection.clicked.connect(self.connectionSetting)
-        self.btnScanPort.clicked.connect(self.addComPortBaudrate) 
-        self.btnConnect.clicked.connect(self.connectComport)
+        self.btnScanUart.clicked.connect(self.addComPortBaudrate) 
+        self.btnConnectUart.clicked.connect(self.connectComport)
 
         # For User Data
         self.btnUserData.clicked.connect(self.userData)
-        self.btnClear.clicked.connect(self.clearDataUser)
+        self.btnClearUserData.clicked.connect(self.clearDataUser)
 
         # For register / Edit user data
         self.btnEditData.clicked.connect(self.registerUserData)
-        self.btnScanRegister.clicked.connect(self.scanTagsUserRegister)
-        self.btnBrowseImage.clicked.connect(self.browseImageUser)
-        self.btnClearDataInput.clicked.connect(self.clearDisplayData)
-        self.btnSaveDataUser.clicked.connect(self.saveRegisterUser)
+        self.btnScanUser.clicked.connect(self.scanTagsUserRegister)
+        self.btnImagePath.clicked.connect(self.browseImageUser)
+        self.btnClrDataInput.clicked.connect(self.clearDisplayData)
+        self.btnSaveUser.clicked.connect(self.saveRegisterUser)
 
         # **********************************************************
         # Manage multiple threads
@@ -103,14 +101,14 @@ class UI(QMainWindow):
         listPort = self.ser.getPortNumber()
         print(listPort)
         for port in listPort:
-            self.cbxScanPort.addItem(port)
+            self.cbxScanPortUart.addItem(port)
 
         # add baudrate
         print(listBaudRate)
         for baudrate in listBaudRate:
-            self.cbxBaudRate.addItem(str(baudrate))
+            self.cbxBaudRateUart.addItem(str(baudrate))
         # setting default index
-            self.cbxBaudRate.setCurrentIndex(4) 
+            self.cbxBaudRateUart.setCurrentIndex(4) 
 
     def showDateTime(self):
         # get time from object QDateTime
@@ -138,14 +136,14 @@ class UI(QMainWindow):
     def connectComport(self):
         try:
             if self.flagConnect == False:
-                comport = self.cbxScanPort.currentText()
-                baurate = self.cbxBaudRate.currentText()
+                comport = self.cbxScanPortUart.currentText()
+                baurate = self.cbxBaudRateUart.currentText()
                 print(comport)
                 print(baurate)
 
                 # connecting to port and baudrate
                 self.ser.connectSerial(serialPort=comport, baudRate=baurate)
-                self.btnConnect.setText('Disconnect')
+                self.btnConnectUart.setText('Disconnect')
                 self.lbConnectionStatus.setText('Connection Status : Connected')
                 self.lbConnectImage.setPixmap(QPixmap('picture/image_tools/Connected.png'))
                 self.lbConnectImage.setScaledContents(True)
@@ -153,7 +151,7 @@ class UI(QMainWindow):
                 pass
             else:
                 self.ser.closeSerial()
-                self.btnConnect.setText('Connect')
+                self.btnConnectUart.setText('Connect')
                 self.lbConnectionStatus.setText('Connection Status : Disconnected')
                 self.lbConnectImage.setPixmap(QPixmap('picture/image_tools/Disconnect.png'))
                 self.lbConnectImage.setScaledContents(True)
@@ -175,8 +173,8 @@ class UI(QMainWindow):
     def connectionSetting(self):
         self.lb_select.setGeometry(-10, 320, 51, 61)
         self.groupBoxConnection.setVisible(True)
-        self.groupBoxUserData.setVisible(False) 
-        self.groupBoxImageID.setVisible(False)
+        self.gbxUserData.setVisible(False) 
+        self.gbxImageID.setVisible(False)
 
 # =================================================================================================================
 # Processing for user Data button
@@ -186,8 +184,8 @@ class UI(QMainWindow):
             # setting multi-media for the  display 
             self.lb_select.setGeometry(-10, 390, 51, 61)
             self.groupBoxConnection.setVisible(True)
-            self.groupBoxUserData.setVisible(True) 
-            self.groupBoxImageID.setVisible(False)
+            self.gbxUserData.setVisible(True) 
+            self.gbxImageID.setVisible(False)
 
             self.clearDataUser()
 
@@ -199,6 +197,7 @@ class UI(QMainWindow):
             self.threadScanTags = threading.Thread(target=self.scanTagsUserData, args=[])
             # Read card and commpare with previously stored data 
             self.threadScanTags.start()
+            
         else:
             print("Not into user data mode if doesn't yet connect")
             msg = QMessageBox() 
@@ -227,7 +226,7 @@ class UI(QMainWindow):
                     self.dataDisplay = ''
                     for i in range(len(receiveData)):
                         self.dataDisplay += '{0:x}'.format(receiveData[i])
-                        self.lbIDUserData.setText('ID: ' + self.dataDisplay)
+                        self.lbIDUser.setText('ID: ' + self.dataDisplay)
 
                     if self.user.checkDataFromDataBase():
                         #TODO: Display data user
@@ -236,11 +235,11 @@ class UI(QMainWindow):
                         pass
 
     def clearDataUser(self):
-        self.lbDisplayName.setText('Waiting...')
-        self.lbDisplayAddress.setText('Waiting...')
-        self.lbDisplayCity.setText('Waiting...')
-        self.lbDisplayCountry.setText('Waiting...')
-        self.lbIDUserData.setText('ID :_______________________')
+        self.lbDispName.setText('Waiting...')
+        self.lbDispAddress.setText('Waiting...')
+        self.lbDispCity.setText('Waiting...')
+        self.lbDispCountry.setText('Waiting...')
+        self.lbIDUser.setText('ID :_______________________')
 
 # =================================================================================================================
 # Processing for Register / Edit User
@@ -250,38 +249,39 @@ class UI(QMainWindow):
             # setting multi-media for the display 
             self.lb_select.setGeometry(-10, 460, 51, 61)
             self.groupBoxConnection.setVisible(True)
-            self.groupBoxUserData.setVisible(True) 
-            self.groupBoxImageID.setVisible(True)
+            self.gbxUserData.setVisible(True) 
+            self.gbxImageID.setVisible(True)
             
-            self.lbReadingTag.setVisible(False)  
-            self.grapViewImgReadingTag.setVisible(False)
-            self.btnCloseTag.setVisible(False)
-            self.lbLoading.setVisible(False)
+            self.lbReadLoading.setVisible(False)  
+            self.grapViewImgLoading.setVisible(False)
+            self.btnCloseLoading.setVisible(False)
+            self.lbWaitLoading.setVisible(False)
 
             self.clearDisplayData()
-            self.radioSearchName.setChecked(True)
+            self.rioSearchName.setChecked(True)
 
-            #Row count 
-            self.tableWidget.setRowCount(4)  
+              #Row count 
+            self.tableWidgetRecord.setRowCount(4)  
     
             #Column count 
-            self.tableWidget.setColumnCount(5)   
+            self.tableWidgetRecord.setColumnCount(2)   
     
-            self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
-            self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
-            self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
-            self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
-            self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
+            self.tableWidgetRecord.setItem(0,0, QTableWidgetItem("Name")) 
+            self.tableWidgetRecord.setItem(0,1, QTableWidgetItem("City")) 
+            self.tableWidgetRecord.setItem(1,0, QTableWidgetItem("Aloysius")) 
+            self.tableWidgetRecord.setItem(1,1, QTableWidgetItem("Indore")) 
+            self.tableWidgetRecord.setItem(2,0, QTableWidgetItem("Alan")) 
+            self.tableWidgetRecord.setItem(2,1, QTableWidgetItem("Bhopal")) 
+            self.tableWidgetRecord.setItem(3,0, QTableWidgetItem("Arnavi")) 
+            self.tableWidgetRecord.setItem(3,1, QTableWidgetItem("Mandsaur")) 
 
-            #Table will fit the screen horizontally 
-            self.tableWidget.horizontalHeader().setStretchLastSection(True) 
-            self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
+
 
             self.flagRegister = True
             self.flagUserData = False
             self.semaphoreRegister.release()
-            
-            
+
+
         else:
             print("Not into Register/Edit User data mode if doesn't yet connect")
             msg = QMessageBox() 
@@ -313,10 +313,10 @@ class UI(QMainWindow):
             x = msg.exec_() # execute the message 
 
     def receivedDataFromReader(self, timeout):
-        self.lbReadingTag.setVisible(True)  
-        self.grapViewImgReadingTag.setVisible(True)
-        self.btnCloseTag.setVisible(True)
-        self.lbLoading.setVisible(True)
+        self.lbReadLoading.setVisible(True)  
+        self.grapViewImgLoading.setVisible(True)
+        self.btnCloseLoading.setVisible(True)
+        self.lbWaitLoading.setVisible(True)
 
         while True:
             # calling accquire method
@@ -330,25 +330,25 @@ class UI(QMainWindow):
 
                 if checkData > 0:
                     # Disable lable loading
-                    self.lbReadingTag.setVisible(False)  
-                    self.grapViewImgReadingTag.setVisible(False)
-                    self.btnCloseTag.setVisible(False)
-                    self.lbLoading.setVisible(False)
+                    self.lbReadLoading.setVisible(False)  
+                    self.grapViewImgLoading.setVisible(False)
+                    self.btnCloseLoading.setVisible(False)
+                    self.lbWaitLoading.setVisible(False)
 
                     # Processing receive data
                     self.dataDisplay = ''
                     for i in range(len(receiveData)):
                         self.dataDisplay += '{0:x}'.format(receiveData[i])
-                        self.lbID.setText('ID    ' + self.dataDisplay)
+                        self.lbIDRegister.setText('ID    ' + self.dataDisplay)
 
 
     def saveRegisterUser(self):
         # fetch the element data from UI
-        self.user.name = self.textName.toPlainText()
-        self.user.address = self.textAddress.toPlainText()
-        self.user.city = self.textCity.toPlainText()
-        self.user.country = self.textCountry.toPlainText()
-        idRaw = self.lbID.text()
+        self.user.name = self.txtName.toPlainText()
+        self.user.address = self.txtAddress.toPlainText()
+        self.user.city = self.txtCity.toPlainText()
+        self.user.country = self.txtCountry.toPlainText()
+        idRaw = self.lbIDRegister.text()
         lenIdRaw = len(idRaw)
         self.user.idUser = idRaw[6: lenIdRaw]
 
@@ -409,13 +409,13 @@ class UI(QMainWindow):
             # TODO: Display the data just saved on the table 
 
     def clearDisplayData(self):
-        self.textName.setText('')
-        self.textAddress.setText('')
-        self.textCity.setText('')
-        self.textCountry.setText('')
-        self.lbID.setText('ID    _________')
-        self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
-        self.btnBrowseImage.setIcon(QtGui.QIcon('picture/image_tools/Click_to_browse.png'))
+        self.txtName.setText('')
+        self.txtAddress.setText('')
+        self.txtCity.setText('')
+        self.txtCountry.setText('')
+        self.lbIDRegister.setText('ID    _________')
+        self.btnImagePath.setIconSize(self.btnImagePath.size())
+        self.btnImagePath.setIcon(QtGui.QIcon('picture/image_tools/Click_to_browse.png'))
         self.user.imageName = ''
 
     def browseImageUser(self):
@@ -426,8 +426,8 @@ class UI(QMainWindow):
         self.user.imageName = os.path.split(imagePath)[-1]
 
         # display the image to button
-        self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
-        self.btnBrowseImage.setIcon(QtGui.QIcon(imagePath))
+        self.btnImagePath.setIconSize(self.btnImagePath.size())
+        self.btnImagePath.setIcon(QtGui.QIcon(imagePath))
 
 
 # =================================================================================================================
@@ -441,5 +441,4 @@ if __name__ == "__main__":
     # widget.addWidget(ui)
     # widget.setFixedWidth(1138)
     # widget.setFixedHeight(844)
-    # widget.show()
     sys.exit(app.exec_())
