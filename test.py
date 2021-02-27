@@ -1,0 +1,218 @@
+from serial_attendance import *
+
+
+ser = SerialComm()
+ser.connectSerial("COM11", 19200)
+
+while True:
+    a = ser.check_data_from_device()
+    if a > 0:
+        print(a)
+        b = ser.get_data_from_device()
+        print(b)
+   
+
+
+# print(len(a))
+# print('{0:x}'.format(a[0]) + '{0:x}'.format(a[1]) + '{0:x}'.format(a[2]) + '{0:x}'.format(a[3]) + '{0:x}'.format(a[4]))
+
+
+
+# import time
+# import threading
+
+
+# start = time.perf_counter()
+# print('start: ', start)
+
+
+# def do_something(seconds):
+#     print(f'Sleeping {seconds} second(s) ... ')
+#     time.sleep(seconds)
+#     print('Done Sleeping ..  ')
+
+# threads = []
+
+# for _ in range(10):
+#     t = threading.Thread(target=do_something, args=[1.5])
+#     t.start()
+#     threads.append(t)
+
+# for thread in threads:
+#     thread.join()
+
+
+# finish = time.perf_counter()
+# print('stop: ', finish)
+
+# print(f'Finished in {round(finish - start, 2)} second(s)')
+
+
+
+
+
+# # importing required librarie 
+# import sys 
+# from PyQt5.QtWidgets import QApplication, QWidget 
+# from PyQt5.QtWidgets import QVBoxLayout, QLabel 
+# from PyQt5.QtGui import QFont 
+# from PyQt5.QtCore import QTimer, QTime, QDate, QDateTime, Qt 
+  
+  
+# class Window(QWidget): 
+  
+#     def __init__(self): 
+#         super().__init__() 
+  
+#         # setting geometry of main window 
+#         self.setGeometry(100, 100, 800, 400) 
+  
+#         # creating a vertical layout 
+#         layout = QVBoxLayout() 
+  
+#         # creating font object 
+#         font = QFont('Arial', 120, QFont.Bold) 
+  
+#         # creating a label object 
+#         self.label = QLabel() 
+  
+#         # setting centre alignment to the label 
+#         self.label.setAlignment(Qt.AlignCenter) 
+  
+#         # setting font to the label 
+#         self.label.setFont(font) 
+  
+#         # adding label to the layout 
+#         layout.addWidget(self.label) 
+  
+#         # setting the layout to main window 
+#         self.setLayout(layout) 
+  
+#         # creating a timer object 
+#         timer = QTimer(self) 
+  
+#         # adding action to timer 
+#         timer.timeout.connect(self.showTime) 
+  
+#         # update the timer every second 
+#         timer.start(1000) 
+  
+#     # method called by timer 
+#     def showTime(self): 
+  
+#         # getting current time 
+#         current_time = QDateTime.currentDateTime()
+
+#         # converting QTime object to string 
+#         label_time = current_time.toString(Qt.DefaultLocaleLongDate) 
+  
+#         # showing it to the label 
+#         self.label.setText(label_time) 
+  
+  
+# # create pyqt5 app 
+# App = QApplication(sys.argv) 
+  
+# # create the instance of our Window 
+# window = Window() 
+  
+# # showing all the widgets 
+# window.show() 
+  
+# # start the app 
+# App.exit(App.exec_())
+
+
+
+# # from queue import Queue 
+# from threading import Thread 
+# import time
+  
+# # A thread that produces data 
+# def producer(out_q): 
+#     while True: 
+#         # Produce some data 
+#         out_q.put('Quoc') 
+          
+# # A thread that consumes data 
+# def consumer(in_q): 
+#     while True: 
+#         # Get some data 
+#         data = in_q.get() 
+#         # Process the data 
+#         print(data)
+#         # Indicate completion
+#         in_q.task_done()
+          
+# # Create the shared queue and launch both threads 
+# q = Queue() 
+# t1 = Thread(target = consumer, args =(q, )) 
+# t2 = Thread(target = producer, args =(q, )) 
+# # t1.start() 
+# # t2.start() 
+
+
+# # Wait for all produced items to be consumed 
+# q.join() 
+
+
+
+
+# import sys
+# from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QLabel, QFileDialog, QAction
+# from PyQt5.QtGui import QIcon, QPixmap
+
+# class MainWindow(QMainWindow):
+
+#     def __init__(self, parent = None):
+#         super(MainWindow, self).__init__(parent)
+
+#         menubar = self.menuBar()
+#         fileMenu = menubar.addMenu('File')
+#         editMenu = menubar.addMenu('Edit')
+#         self.resize(500, 500)
+
+#         dlg = QFileDialog(self)       
+#         openAction = QAction('Open Image', self)  
+#         openAction.triggered.connect(self.openImage) 
+#         fileMenu.addAction(openAction)
+
+#         closeAction = QAction('Exit', self)  
+#         closeAction.triggered.connect(self.close) 
+#         fileMenu.addAction(closeAction)
+
+
+
+#     def openImage(self):
+#     # This function is called when the user clicks File->Open Image.
+#         label = QLabel(self)
+#         filename = QFileDialog.getOpenFileName()
+#         imagePath = filename[0]
+#         print(imagePath)
+#         pixmap = QPixmap(imagePath)
+#         label.setPixmap(pixmap)
+#         self.resize(pixmap.width(),pixmap.height())
+#         self.show()
+
+
+
+# def main():
+#     app = QApplication(sys.argv)
+#     win = MainWindow()
+#     win.show()
+#     app.exec_()
+
+# if __name__ == '__main__':
+#     sys.exit(main()) 
+
+
+
+# import os
+
+# s = "D:/Study/Tren_lop/DeCuongLuanVan/UI/Attendance_System/picture/image_tools/icon_pen.png"
+# print (os.path.split(s)[-1])
+# print(os.path.basename(s))
+
+
+
+
