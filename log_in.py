@@ -10,7 +10,6 @@ from serial_attendance import *
 
 listPort = []
 
-
  
 firebaseConfig = {   
     'apiKey': "AIzaSyAx3uJ5dHV8jtxAENTPEbt7mh_hokOhMbY",

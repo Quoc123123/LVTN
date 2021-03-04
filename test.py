@@ -216,57 +216,101 @@
 
 
 
-import sys 
-from PyQt5.QtWidgets import * 
+# import sys 
+# from PyQt5.QtWidgets import * 
                     
    
-#Main Window 
-class App(QWidget): 
-    def __init__(self): 
-        super().__init__() 
-        self.title = 'PyQt5 - QTableWidget'
-        self.left = 0
-        self.top = 0
-        self.width = 300
-        self.height = 200
+# #Main Window 
+# class App(QWidget): 
+#     def __init__(self): 
+#         super().__init__() 
+#         self.title = 'PyQt5 - QTableWidget'
+#         self.left = 0
+#         self.top = 0
+#         self.width = 300
+#         self.height = 200
    
-        self.setWindowTitle(self.title) 
-        self.setGeometry(self.left, self.top, self.width, self.height) 
+#         self.setWindowTitle(self.title) 
+#         self.setGeometry(self.left, self.top, self.width, self.height) 
    
-        self.createTable() 
+#         self.createTable() 
    
-        self.layout = QVBoxLayout() 
-        self.layout.addWidget(self.tableWidget) 
-        self.setLayout(self.layout) 
+#         self.layout = QVBoxLayout() 
+#         self.layout.addWidget(self.tableWidget) 
+#         self.setLayout(self.layout) 
    
-        #Show window 
-        self.show() 
+#         #Show window 
+#         self.show() 
    
-    #Create table 
-    def createTable(self): 
-        self.tableWidget = QTableWidget() 
+#     #Create table 
+#     def createTable(self): 
+#         self.tableWidget = QTableWidget() 
   
-        #Row count 
-        self.tableWidget.setRowCount(4)  
+#         #Row count 
+#         self.tableWidget.setRowCount(4)  
   
-        #Column count 
-        self.tableWidget.setColumnCount(2)   
+#         #Column count 
+#         self.tableWidget.setColumnCount(2)   
   
-        self.tableWidget.setItem(0,0, QTableWidgetItem("Name")) 
-        self.tableWidget.setItem(0,1, QTableWidgetItem("City")) 
-        self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius")) 
-        self.tableWidget.setItem(1,1, QTableWidgetItem("Indore")) 
-        self.tableWidget.setItem(2,0, QTableWidgetItem("Alan")) 
-        self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal")) 
-        self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi")) 
-        self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur")) 
+#         self.tableWidget.setItem(0,0, QTableWidgetItem("Name")) 
+#         self.tableWidget.setItem(0,1, QTableWidgetItem("City")) 
+#         self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius")) 
+#         self.tableWidget.setItem(1,1, QTableWidgetItem("Indore")) 
+#         self.tableWidget.setItem(2,0, QTableWidgetItem("Alan")) 
+#         self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal")) 
+#         self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi")) 
+#         self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur")) 
    
-        #Table will fit the screen horizontally 
-        self.tableWidget.horizontalHeader().setStretchLastSection(True) 
-        self.tableWidget.horizontalHeader().setSectionResizeMode( 
-            QHeaderView.Stretch) 
+#         #Table will fit the screen horizontally 
+#         self.tableWidget.horizontalHeader().setStretchLastSection(True) 
+#         self.tableWidget.horizontalHeader().setSectionResizeMode( 
+#             QHeaderView.Stretch) 
    
-if __name__ == '__main__': 
-    app = QApplication(sys.argv) 
-    ex = App() 
-    sys.exit(app.exec_()) 
+# if __name__ == '__main__': 
+#     app = QApplication(sys.argv) 
+#     ex = App() 
+#     sys.exit(app.exec_()) 
+
+
+
+# import MySQLdb
+# from datetime import datetime
+# dbConn=MySQLdb.connect("127.0.0.1","root","mobile","emp_attendance")or die("couldn't connect to DB")
+# emp_name=input("Enter your name: ")
+# emp_email=input("Enter your email: ")
+# emp_pass=input("Enter validation text: ")
+# emp_adr=input("Enter Address: ")
+# emp_con=input("Enter Contact Number: ")
+# month="%02d"%datetime.now().month
+# day="%02d"%datetime.now().day
+# emp_date=str(datetime.now().year)+"-"+month+"-"+day
+# emp_rfid=raw_input("Enter given rfid number: ")
+# emp_rfid=" "+emp_rfid
+# cursor=dbConn.cursor()
+# cursor.execute("Select * from employee_dat where email=(%s)",(emp_email))
+# result=cursor.fetchall()
+# x=int(cursor.rowcount)
+# if(x!=0):
+#     print "User already exists"
+# else:
+    
+#     cursor.execute("insert into employee_dat (emp_name,emp_pass,email,contact,emp_add,join_date,rfid_num) values (%s,%s,%s,%s,%s,%s,%s)",(emp_name,emp_pass,emp_email,emp_con,emp_adr,emp_date,emp_rfid))
+#     cursor.execute("select emp_id from employee_dat where email=(%s)",(emp_email))
+#     result=cursor.fetchone()
+#     result=str(result[0])
+#     qry="create table %s(serial int(5) AUTO_INCREMENT NOT NULL PRIMARY KEY,mon_yr varchar(6))"%(result+"_attn_mo")
+#     cursor.execute(qry)
+# dbConn.commit()
+# cursor.close()
+
+from user_infor import *
+
+
+test = UserInfor()
+
+
+# test.mysqlConnection()
+# test.insertData('quoc', '1122f1', 'bk', 'hcm', 'VN', 'D:/Study/Tren_lop/DeCuongLuanVan/UI/Attendance_System/picture/image_tools/icon_select.jpg')
+# test.mysqlDisconnect()
+
+test.selectTable()

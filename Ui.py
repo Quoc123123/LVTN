@@ -91,6 +91,13 @@ class UI(QMainWindow):
 
         self.flagRegister = False
         self.flagUserData = False
+
+        self.name = ''
+        self.address = ''
+        self.city = ''
+        self.country = ''
+        self.imageName = ''
+        self.idUser = ''
         
 
         self.show()
@@ -344,25 +351,25 @@ class UI(QMainWindow):
 
     def saveRegisterUser(self):
         # fetch the element data from UI
-        self.user.name = self.textName.toPlainText()
-        self.user.address = self.textAddress.toPlainText()
-        self.user.city = self.textCity.toPlainText()
-        self.user.country = self.textCountry.toPlainText()
+        self.name = self.textName.toPlainText()
+        self.address = self.textAddress.toPlainText()
+        self.city = self.textCity.toPlainText()
+        self.country = self.textCountry.toPlainText()
         idRaw = self.lbID.text()
         lenIdRaw = len(idRaw)
-        self.user.idUser = idRaw[6: lenIdRaw]
+        self.idUser = idRaw[6: lenIdRaw]
 
-        print('user name: ', self.user.name)
-        print('user address: ', self.user.address)
-        print('user city: ', self.user.city)
-        print('user country: ', self.user.country)
-        print('id user: ', self.user.idUser)
-        print('user imagepath: ', self.user.imageName)
+        print('user name: ', self.name)
+        print('user address: ', self.address)
+        print('user city: ', self.city)
+        print('user country: ', self.country)
+        print('id user: ', self.idUser)
+        print('user imagepath: ', self.imageName)
 
         # check the conditions needs to save data of user, 
         # vice sersa will notify the administrator 
-        if len(self.user.name) == 0 and len(self.user.address) == 0 \
-            and len(self.user.city) == 0 and len(self.user.country) == 0:
+        if len(self.name) == 0 and len(self.address) == 0 \
+            and len(self.city) == 0 and len(self.country) == 0:
             print("Not eligible for registration because the textbox yet fill out")
             msg = QMessageBox() 
             msg.setWindowTitle("Information")
@@ -371,7 +378,7 @@ class UI(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
-        elif self.user.idUser == 'ID    _________':
+        elif self.idUser == 'ID    _________':
             print("Not eligible for registration because the id user yet scan") 
             msg = QMessageBox() 
             msg.setWindowTitle("Information")
@@ -381,7 +388,7 @@ class UI(QMainWindow):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
         
-        elif len(self.user.imageName) == 0:
+        elif len(self.imageName) == 0:
             print("Not eligible for registration because the browse choose the image yet ") 
             msg = QMessageBox() 
             msg.setWindowTitle("Information")
@@ -391,22 +398,40 @@ class UI(QMainWindow):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
         else:
-            print('the data user validated')
-            # Save data to database
-            self.user.saveData()
+            print('the data was validated')
+            if self.user.mysqlConnection():
+                print('Connect to database successfully')
+                # Connect to database succesfully
+                # Save data to database
+                if self.user.saveData(self.name, self.address, self.city, self.country, self.imageName, self.idUser):
+                    # Clear data for the next register
+                    self.clearDisplayData()
 
-            msg = QMessageBox() 
-            msg.setWindowTitle("Information")
-            msg.setText("Data saved successfullly")
-            msg.setIcon(QMessageBox.Information)
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setDefaultButton(QMessageBox.Ok)
-            x = msg.exec_() # execute the message
+                    msg = QMessageBox() 
+                    msg.setWindowTitle("Information")
+                    msg.setText("Data saved successfullly")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.setDefaultButton(QMessageBox.Ok)
+                    x = msg.exec_() # execute the message
 
-            # Clear data for the next register
-            self.clearDisplayData()
+                    # TODO: Display the data just saved on the table 
+                else:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText('Data fai')
+                    msg.setInformativeText('Data failed to save')
+                    msg.setWindowTitle("Error")
+                    msg.exec_()
+            else:
+                # Failed to connect to database
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("Error Message")
+                msg.setInformativeText('Please check that the server is ready !!!')
+                msg.setWindowTitle("Error")
+                msg.exec_()
 
-            # TODO: Display the data just saved on the table 
 
     def clearDisplayData(self):
         self.textName.setText('')
@@ -416,14 +441,14 @@ class UI(QMainWindow):
         self.lbID.setText('ID    _________')
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
         self.btnBrowseImage.setIcon(QtGui.QIcon('picture/image_tools/Click_to_browse.png'))
-        self.user.imageName = ''
+        self.imageName = ''
 
     def browseImageUser(self):
         # Choose the image file for the user data
         filename = QFileDialog.getOpenFileName()
         imagePath = filename[0]
         print(imagePath)
-        self.user.imageName = os.path.split(imagePath)[-1]
+        self.imageName = os.path.split(imagePath)[-1]
 
         # display the image to button
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
