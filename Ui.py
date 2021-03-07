@@ -13,6 +13,12 @@ from user_infor import *
 listPort = []
 listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
+PATH_IMAGE_USER = 'image_user/'
+PATH_IMAGE_TOOLS = 'image_tools/'
+PATH_IMAGE_SAVE = 'image_save/'
+
+
+
 
 # ******************************************************************************************************************
 # PageOne of UI  
@@ -96,7 +102,7 @@ class UI(QMainWindow):
         self.address = ''
         self.city = ''
         self.country = ''
-        self.imageName = ''
+        self.imagePath = ''
         self.idUser = ''
         
 
@@ -189,14 +195,13 @@ class UI(QMainWindow):
 # Processing for user Data button
 # =================================================================================================================
     def userData(self):
+        self.clearDataUser()
         if self.flagConnect:
             # setting multi-media for the  display 
             self.lb_select.setGeometry(-10, 390, 51, 61)
             self.groupBoxConnection.setVisible(True)
             self.groupBoxUserData.setVisible(True) 
             self.groupBoxImageID.setVisible(False)
-
-            self.clearDataUser()
 
             self.flagRegister = False
             self.flagUserData = True
@@ -236,11 +241,20 @@ class UI(QMainWindow):
                         self.dataDisplay += '{0:x}'.format(receiveData[i])
                         self.lbIDUserData.setText('ID: ' + self.dataDisplay)
 
-                    if self.user.checkDataFromDataBase():
-                        #TODO: Display data user
-                        pass
+                    id = self.lbIDUserData.text()[4:]
+                    if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
+                        ls = self.user.getDataUser(id)
+                        self.lbDisplayName.setText(ls[0])
+                        self.lbIDUserData.setText('ID: ' + ls[1])
+                        self.lbDisplayAddress.setText(ls[2])
+                        self.lbDisplayCity.setText(ls[3])
+                        self.lbDisplayCountry.setText(ls[4])
+                        self.lbViewUser.setScaledContents(True)
+                        self.lbViewUser.setPixmap(QPixmap(ls[5]))
+
                     else:
                         pass
+                        #TODO: Display the message user doesn't register yet
 
     def clearDataUser(self):
         self.lbDisplayName.setText('Waiting...')
@@ -248,6 +262,7 @@ class UI(QMainWindow):
         self.lbDisplayCity.setText('Waiting...')
         self.lbDisplayCountry.setText('Waiting...')
         self.lbIDUserData.setText('ID :_______________________')
+        self.lbViewUser.setPixmap(QPixmap(''))
 
 # =================================================================================================================
 # Processing for Register / Edit User
@@ -268,10 +283,10 @@ class UI(QMainWindow):
             self.clearDisplayData()
             self.radioSearchName.setChecked(True)
 
-            #Row count 
+            # Row count 
             self.tableWidget.setRowCount(4)  
     
-            #Column count 
+            # Column count 
             self.tableWidget.setColumnCount(5)   
     
             self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
@@ -286,8 +301,6 @@ class UI(QMainWindow):
 
             self.flagRegister = True
             self.flagUserData = False
-            self.semaphoreRegister.release()
-            
             
         else:
             print("Not into Register/Edit User data mode if doesn't yet connect")
@@ -325,6 +338,9 @@ class UI(QMainWindow):
         self.btnCloseTag.setVisible(True)
         self.lbLoading.setVisible(True)
 
+        self.semaphoreRegister.release()
+        
+        start_time = time.time()
         while True:
             # calling accquire method
             self.semaphoreRegister.acquire()
@@ -347,7 +363,11 @@ class UI(QMainWindow):
                     for i in range(len(receiveData)):
                         self.dataDisplay += '{0:x}'.format(receiveData[i])
                         self.lbID.setText('ID    ' + self.dataDisplay)
-
+            # Disable lable loading
+            self.lbReadingTag.setVisible(False)  
+            self.grapViewImgReadingTag.setVisible(False)
+            self.btnCloseTag.setVisible(False)
+            self.lbLoading.setVisible(False)
 
     def saveRegisterUser(self):
         # fetch the element data from UI
@@ -364,21 +384,11 @@ class UI(QMainWindow):
         print('user city: ', self.city)
         print('user country: ', self.country)
         print('id user: ', self.idUser)
-        print('user imagepath: ', self.imageName)
+        print('user imagepath: ', self.imagePath)
 
         # check the conditions needs to save data of user, 
         # vice sersa will notify the administrator 
-        if len(self.name) == 0 and len(self.address) == 0 \
-            and len(self.city) == 0 and len(self.country) == 0:
-            print("Not eligible for registration because the textbox yet fill out")
-            msg = QMessageBox() 
-            msg.setWindowTitle("Information")
-            msg.setText("Please fill in the textbox completely!!!")
-            msg.setIcon(QMessageBox.Information)
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setDefaultButton(QMessageBox.Ok)
-            x = msg.exec_() # execute the message
-        elif self.idUser == 'ID    _________':
+        if self.idUser == 'ID    _________':
             print("Not eligible for registration because the id user yet scan") 
             msg = QMessageBox() 
             msg.setWindowTitle("Information")
@@ -387,51 +397,75 @@ class UI(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
-        
-        elif len(self.imageName) == 0:
-            print("Not eligible for registration because the browse choose the image yet ") 
-            msg = QMessageBox() 
-            msg.setWindowTitle("Information")
-            msg.setText("Please click the scan browse to have the image of user!!!")
-            msg.setIcon(QMessageBox.Information)
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setDefaultButton(QMessageBox.Ok)
-            x = msg.exec_() # execute the message
         else:
-            print('the data was validated')
-            if self.user.mysqlConnection():
-                print('Connect to database successfully')
-                # Connect to database succesfully
-                # Save data to database
-                if self.user.saveData(self.name, self.address, self.city, self.country, self.imageName, self.idUser):
-                    # Clear data for the next register
-                    self.clearDisplayData()
-
+            # Check the data exits or not 
+            status = self.user.checkDataUser(self.idUser)
+            if  status == mysql_query_status['USER_EXIST']:
+                # User exists
+                msg = QMessageBox() 
+                msg.setWindowTitle("Information")
+                msg.setText("User registered, do you want to edit the data ?")
+                msg.setIcon(QMessageBox.Question)
+                msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                msg.setDefaultButton(QMessageBox.Yes)
+                x = msg.exec_() # execute the message
+                if x == QMessageBox.Yes:
+                    pass
+                    # TODO: Edit data on database
+            else:
+                if len(self.name) == 0 and len(self.address) == 0 \
+                    and len(self.city) == 0 and len(self.country) == 0:
+                    print("Not eligible for registration because the textbox yet fill out")
                     msg = QMessageBox() 
                     msg.setWindowTitle("Information")
-                    msg.setText("Data saved successfullly")
+                    msg.setText("Please fill in the textbox completely!!!")
                     msg.setIcon(QMessageBox.Information)
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.setDefaultButton(QMessageBox.Ok)
                     x = msg.exec_() # execute the message
 
-                    # TODO: Display the data just saved on the table 
-                else:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setText('Data fai')
-                    msg.setInformativeText('Data failed to save')
-                    msg.setWindowTitle("Error")
-                    msg.exec_()
-            else:
-                # Failed to connect to database
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Critical)
-                msg.setText("Error Message")
-                msg.setInformativeText('Please check that the server is ready !!!')
-                msg.setWindowTitle("Error")
-                msg.exec_()
+                elif self.idUser == 'ID    _________':
+                    print("Not eligible for registration because the id user yet scan") 
+                    msg = QMessageBox() 
+                    msg.setWindowTitle("Information")
+                    msg.setText("Please click the scan button to have the code tags!!!")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.setDefaultButton(QMessageBox.Ok)
+                    x = msg.exec_() # execute the message
+        
+                elif len(self.imagePath) == 0:
+                    print("Not eligible for registration because the browse choose the image yet ") 
+                    msg = QMessageBox() 
+                    msg.setWindowTitle("Information")
+                    msg.setText("Please click the scan browse to have the image of user!!!")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.setDefaultButton(QMessageBox.Ok)
+                    x = msg.exec_() # execute the message
 
+                else:
+                    # User does't register yet
+                    status = self.user.insertData(self.name, self.idUser, self.address, self.city, self.country, self.imagePath)
+                    if status == mysql_query_status['INSET_OK']:
+                        msg = QMessageBox() 
+                        msg.setWindowTitle("Information")
+                        msg.setText("Data saved successfullly")
+                        msg.setIcon(QMessageBox.Information)
+                        msg.setStandardButtons(QMessageBox.Ok)
+                        msg.setDefaultButton(QMessageBox.Ok)
+                        x = msg.exec_() # execute the message
+
+                        # Clear data for the next register
+                        self.clearDisplayData()
+                        # TODO: Display the data just inserted on the table 
+                    else:
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setText('Data failed')
+                        msg.setInformativeText('Data failed to save')
+                        msg.setWindowTitle("Error")
+                        x = msg.exec_()
 
     def clearDisplayData(self):
         self.textName.setText('')
@@ -441,18 +475,18 @@ class UI(QMainWindow):
         self.lbID.setText('ID    _________')
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
         self.btnBrowseImage.setIcon(QtGui.QIcon('picture/image_tools/Click_to_browse.png'))
-        self.imageName = ''
+        self.imagePath = ''
 
     def browseImageUser(self):
         # Choose the image file for the user data
         filename = QFileDialog.getOpenFileName()
-        imagePath = filename[0]
-        print(imagePath)
-        self.imageName = os.path.split(imagePath)[-1]
+        self.imagePath = filename[0]
+        print(self.imagePath)
+        # self.imagePath = os.path.split(imagePath)[-1]
 
         # display the image to button
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
-        self.btnBrowseImage.setIcon(QtGui.QIcon(imagePath))
+        self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
 
 
 # =================================================================================================================

@@ -28,12 +28,18 @@ dictConnect = {
 }
 
 mysql_query_status = {
-    'CONNECTION_OK': 1,
+    'OK': 0,
+    'ERROR': 1,
     'CONNECTION_ERROR': 2,
-    'INSET_OK': 3
+    'INSET_OK': 3,
+    'INSET_ERROR': 4,
+    'UPDATE_OK': 5,
+    'UPDATE_ERROR': 6,
+    'DELETE_OK': 7,
+    'DELETE_ERROR': 8,
+    'USER_EXIST': 9,
+    'USER_NOT_EXIST': 10,
 }
-
-
 
 class UserInfor:
     # Temporary hard code totalUser = 0
@@ -61,11 +67,6 @@ class UserInfor:
 
         #TODO: Add the data to database
 
-    # Check data from database
-    def checkDataFromDataBase(self):
-        # Temporary hardcode not exits the user
-        return False
-
     def mysqlConnection(self):
         ret = False
         try:
@@ -88,6 +89,7 @@ class UserInfor:
     
     def mysqlDisconnect(self):
         try:
+            self.myCursor.close()
             self.myDatabase.close()
             print('Disconnecting successfully')
         except:
@@ -124,7 +126,8 @@ class UserInfor:
             print(self.myCursor.rowcount, 'details inserted')
 
             # To ensure the data insertion, Always commit to the database.
-            self.myDatabase.commit()  
+            self.myDatabase.commit()
+            return mysql_query_status['INSET_OK']
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -145,12 +148,6 @@ class UserInfor:
                 self.myCursor.close()
                 self.myDatabase.close()
                 print('MySQL connection is closed')
-
-    def writeFile(self, data, filename):
-        # Convert binary data to proper format and write it on Hard Disk
-        with open('{}.png'.format(filename), 'wb') as file:
-            file.write(data)
-        file.close()
 
     def selectTable(self):
         try:
@@ -193,26 +190,23 @@ class UserInfor:
                 self.myDatabase.close()
                 print('MySQL connection is closed')
 
-    def sortTable(self):
+    def sortTable(self, columns, ascending = True):
         try:
             self.myDatabase = mysql.connector.connect(**dictConnect)
             print(self.myDatabase)
             self.myCursor = self.myDatabase.cursor()
             print('Connecting successfully')
 
-            query = 'SELECT * FROM {}'.format(TABLE_NAME)
+            if ascending:
+                query = 'SELECT * FROM {} ORDER BY {} {}'.format(TABLE_NAME, columns, 'ASC')
+            else:
+                query = 'SELECT * FROM {} ORDER BY {} {}'.format(TABLE_NAME, columns, 'DESC') 
+            print('qerry: ' + query)
             self.myCursor.execute(query)
+
             record = self.myCursor.fetchall()
             for row in record: 
-                print('{} = {}'.format(table_columns_elements[0], row[0]))
-                print('{} = {}'.format(table_columns_elements[1], row[1]))
-                print('{} = {}'.format(table_columns_elements[2], row[2]))
-                print('{} = {}'.format(table_columns_elements[3], row[3]))
-                print('{} = {}'.format(table_columns_elements[4], row[4]))
-                print('Storing employee image and bio-data on disk')
-                #TODO: save the image adhere to format included both name and id  
-                self.writeFile(row[5], 'photo')
-                break
+                print(row[:-1])
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -226,7 +220,7 @@ class UserInfor:
                 print('Error: Database was duplicated')
                 return mysql_query_status['CONNECTION_ERROR']
             else:
-                print('Error: Failed to read the data from MYSQL table {}').format(err)
+                print('Error: Failed to ascending the data from MYSQL table {}').format(err)
                 return mysql_query_status['CONNECTION_ERROR']
         finally:
            if self.myDatabase.is_connected():
@@ -234,27 +228,220 @@ class UserInfor:
                 self.myDatabase.close()
                 print('MySQL connection is closed')
 
+    def deleteRow(self, id):
+        try:
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+
+            query = 'DELETE FROM {} WHERE {} = {}'.format(TABLE_NAME, table_columns_elements[1], id)
+            print('query: ' + query)
+            self.myCursor.execute(query)
+            
+            # To ensure the data insertion, Always commit to the database.
+            self.myDatabase.commit()  
+            print('number of rows deleted', self.myCursor.rowcount)
 
 
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
 
-    def deleteTable(self):
-        pass
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                print('Error: Failed to delete record from MYSQL table {}').format(err)
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')
 
+    def updateUser(self, id, columns, value):
+        try:
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+            print('Before updating a record')
+            query = 'SELECT *  FROM {} WHERE {} = {}'.format(TABLE_NAME, table_columns_elements[1], id)
+            print('query: ' + query)
+            self.myCursor.execute(query)
+            record = self.myCursor.fetchone()
+            print(record)
+
+            # Update single record now
+            query = "UPDATE {} SET {} = '{}' WHERE {} = {}".format(TABLE_NAME, columns, value, table_columns_elements[1], id)
+            print('query: ' + query)
+            
+            self.myCursor.execute(query)
+            # To ensure the data insertion, Always commit to the database.
+            self.myDatabase.commit()  
+            print('Record updated successfully')
+            print('After updating record')
+            query = 'SELECT *  FROM {} WHERE {} = {}'.format(TABLE_NAME, table_columns_elements[1], id)
+            self.myCursor.execute(query)
+            record = self.myCursor.fetchone()
+            print(record)
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
+
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                # Update failed message as an error
+                print('Error: Failed to update record from MYSQL table {}').format(err)
+                # reverting changes because of exception
+                self.myCursor.rollback()
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')
+
+    def getNumberUser(self):
+        try:
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+
+            # get number rows in a table and give your table
+            query = 'SELECT *  FROM {}'.format(TABLE_NAME)
+            number_of_rows = self.myCursor.execute(query)
+            print(number_of_rows)
+            return number_of_rows
+
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
+
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                print('Error: Failed to ascending the data from MYSQL table {}').format(err)
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')
+
+    def checkDataUser(self, ID):
+        try:
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+            
+            query = 'SELECT * FROM {}'.format(TABLE_NAME)
+            self.myCursor.execute(query)
+            record = self.myCursor.fetchall()
+            for row in record: 
+                # print('{} = {}'.format(table_columns_elements[1], row[1]))
+                if ID == row[1]:
+                    print('exist data user: {}'.format(row[:-1]))
+                    self.mysqlDisconnect()
+                    return mysql_query_status['USER_EXIST']
+            print('User register yet')
+            self.mysqlDisconnect()
+            return mysql_query_status['USER_NOT_EXIST']    
+                
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
+
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                print('Error: Failed to ascending the data from MYSQL table {}').format(err)
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')
+        
+        
+    def getDataUser(self, ID):
+        try:
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+            
+            query = 'SELECT * FROM {}'.format(TABLE_NAME)
+            self.myCursor.execute(query)
+            record = self.myCursor.fetchall()
+            for row in record: 
+                # print('{} = {}'.format(table_columns_elements[1], row[1]))
+                if ID == row[1]:
+                    print('exist data user: {}'.format(row[:-1]))
+                    self.mysqlDisconnect()
+                    ls = list(row[:-1])
+                    file_image = 'picture/image_save/{}_{}_{}'.format(ls[0], ls[1], get_current_time())
+                    self.writeFile(row[5], file_image)
+                    ls.append(file_image)
+                    print(ls)
+                    return ls
+                    
+                
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
+
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                print('Error: Failed to ascending the data from MYSQL table {}').format(err)
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')  
+
+    def writeFile(self, data, filename):
+        # Convert binary data to proper format and write it on Hard Disk
+        with open('{}.png'.format(filename), 'wb') as file:
+            file.write(data)
+        file.close()
 
     def convertToBinaryData(self, filename):
         # Convert digital data to binary format
         with open(filename, 'rb') as file:
             binaryData = file.read()
         return binaryData
-
-    
-    
-        
-
-    
-        
-    
-    
 
 
     

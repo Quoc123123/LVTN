@@ -313,4 +313,12 @@ test = UserInfor()
 # test.insertData('quoc', '1122f1', 'bk', 'hcm', 'VN', 'D:/Study/Tren_lop/DeCuongLuanVan/UI/Attendance_System/picture/image_tools/icon_select.jpg')
 # test.mysqlDisconnect()
 
-test.selectTable()
+# test.selectTable()
+# test.sortTable(table_columns_elements[1])
+# test.updateUser('123', 'Name', 'quocbrave')
+# print(test.getNumberUser())
+# test.checkDataUser('123')'
+
+
+
+test.getDataUser('1122f1')

@@ -36,6 +36,24 @@ def speakMessage(message, rate, volume, voices):
         engine.say('{}'.format(message))
         engine.runAndWait()
 
+#===============================================================================
+# Log debug
+#===============================================================================
+def PRINT_INFO_LOG(message):
+    print('INFO: ' + message)
+
+def PRINT_ERROR_LOG(message):
+    print('ERROR: ' + message)
+
+
+
+#===============================================================================
+# Fet current time
+#===============================================================================
+def get_current_time():
+    now = datetime.datetime.now()
+    time_now = now.strftime("%m_%d_%Y_%H_%M_%S")
+    return time_now
 
 #===============================================================================
 # Connect with database
