@@ -15,7 +15,8 @@ table_columns_elements = {
     2 : 'Address',
     3 : 'City',
     4 : 'Country',
-    5 : 'Images',
+    5 : 'Time',
+    6 : 'Images',
 }
 
 
@@ -50,22 +51,13 @@ class UserInfor:
         self.address = ''
         self.city = ''
         self.country = ''
+        self.timeRegister = ''
         self.imagePath = ''
 
         self.myDatabase = ''
         self.myCursor = ''
 
         # TODO: Loading data and count how many users  were registerd  
-
-    def saveData(self, name, address, city, country, imagePath, idUser):
-        self.name = name
-        self.address = address
-        self.city = city
-        self.country = country
-        self.imagePath = imagePath
-        self.idUser = idUser
-
-        #TODO: Add the data to database
 
     def mysqlConnection(self):
         ret = False
@@ -95,33 +87,35 @@ class UserInfor:
         except:
             print('Fail to disconnect the database')
 
-    def insertData(self, name, idUser, address, city, country, imagePath):
+    def insertData(self, name, idUser, address, city, country, time, imagePath):
         try:
             self.myDatabase = mysql.connector.connect(**dictConnect)
             print(self.myDatabase)
             self.myCursor = self.myDatabase.cursor()
             print('Connecting successfully')
-            insertQueryColumns = "INSERT INTO {} ({}, {}, {}, {}, {}, {}) ".format(TABLE_NAME, 
+            insertQueryColumns = "INSERT INTO {} ({}, {}, {}, {}, {}, {}, {}) ".format(TABLE_NAME, 
                                                                     table_columns_elements[0], 
                                                                     table_columns_elements[1], 
                                                                     table_columns_elements[2], 
                                                                     table_columns_elements[3], 
                                                                     table_columns_elements[4], 
-                                                                    table_columns_elements[5]) + \
-                                                                    "VALUES (%s, %s, %s, %s, %s, %s)"
+                                                                    table_columns_elements[5],
+                                                                    table_columns_elements[6]) + \
+                                                                    "VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
             self.name = name
             self.idUser = idUser 
             self.address = address
             self.city = city
             self.country = country
+            self.timeRegister = time
             self.imagePath = self.convertToBinaryData(imagePath)
 
             # Convert data into tuple format
-            insertQueryValues = (self.name, self.idUser, self.address, self.city, self.country, self.imagePath)                                                                                 
+            insertQueryValues = (self.name, self.idUser, self.address, self.city, self.country, self.timeRegister, self.imagePath)                                                                                 
             self.myCursor.execute(insertQueryColumns, insertQueryValues) 
 
-            insertQueryValues = (self.name, self.idUser, self.address, self.city, self.country, os.path.split(imagePath)[-1])  
+            insertQueryValues = (self.name, self.idUser, self.address, self.city, self.country, self.timeRegister, os.path.split(imagePath)[-1])  
             print('Table {} inserted successfully'.format(insertQueryColumns) % (insertQueryValues))  
             print(self.myCursor.rowcount, 'details inserted')
 
@@ -165,9 +159,10 @@ class UserInfor:
                 print('{} = {}'.format(table_columns_elements[2], row[2]))
                 print('{} = {}'.format(table_columns_elements[3], row[3]))
                 print('{} = {}'.format(table_columns_elements[4], row[4]))
+                print('{} = {}'.format(table_columns_elements[4], row[5]))
                 print('Storing employee image and bio-data on disk')
                 #TODO: save the image adhere to format included both name and id  
-                self.writeFile(row[5], 'photo')
+                self.writeFile(row[6], 'photo')
                 break
 
         except mysql.connector.Error as err:
@@ -404,8 +399,8 @@ class UserInfor:
                     print('exist data user: {}'.format(row[:-1]))
                     self.mysqlDisconnect()
                     ls = list(row[:-1])
-                    file_image = 'picture/image_save/{}_{}_{}'.format(ls[0], ls[1], get_current_time())
-                    self.writeFile(row[5], file_image)
+                    file_image = 'picture/image_save/{}_{}_{}'.format(ls[0], ls[1], ls[5])
+                    self.writeFile(row[6], file_image)
                     ls.append(file_image)
                     print(ls)
                     return ls

@@ -40,10 +40,10 @@ def speakMessage(message, rate, volume, voices):
 # Log debug
 #===============================================================================
 def PRINT_INFO_LOG(message):
-    print('INFO: ' + message)
+    print('[INFO] ' + message)
 
 def PRINT_ERROR_LOG(message):
-    print('ERROR: ' + message)
+    print('[ERROR] ' + message)
 
 
 

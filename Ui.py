@@ -13,9 +13,9 @@ from user_infor import *
 listPort = []
 listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
-PATH_IMAGE_USER = 'image_user/'
-PATH_IMAGE_TOOLS = 'image_tools/'
-PATH_IMAGE_SAVE = 'image_save/'
+PATH_IMAGE_USER = 'picture/image_user/'
+PATH_IMAGE_TOOLS = 'picture/image_tools/'
+PATH_IMAGE_SAVE = 'picture/image_save/'
 
 
 
@@ -99,13 +99,15 @@ class UI(QMainWindow):
         self.flagUserData = False
 
         self.name = ''
+        self.idUser = ''
         self.address = ''
         self.city = ''
         self.country = ''
+        self.timeRegister = ''
         self.imagePath = ''
-        self.idUser = ''
         
 
+        # show init UI
         self.show()
         
 # ******************************************************************************************************************
@@ -140,7 +142,7 @@ class UI(QMainWindow):
         if self.flagConnect:
             if self.flagBlinkConnect:
                 self.flagBlinkConnect = False
-                self.lbConnectImage.setPixmap(QPixmap('picture/image_tools/Connected.png'))
+                self.lbConnectImage.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'Connected.png'))
             else:
                 self.flagBlinkConnect = True
                 self.lbConnectImage.setPixmap(QPixmap(''))
@@ -160,7 +162,7 @@ class UI(QMainWindow):
                 self.ser.connectSerial(serialPort=comport, baudRate=baurate)
                 self.btnConnect.setText('Disconnect')
                 self.lbConnectionStatus.setText('Connection Status : Connected')
-                self.lbConnectImage.setPixmap(QPixmap('picture/image_tools/Connected.png'))
+                self.lbConnectImage.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'Connected.png'))
                 self.lbConnectImage.setScaledContents(True)
                 self.flagConnect = True
                 pass
@@ -168,7 +170,7 @@ class UI(QMainWindow):
                 self.ser.closeSerial()
                 self.btnConnect.setText('Connect')
                 self.lbConnectionStatus.setText('Connection Status : Disconnected')
-                self.lbConnectImage.setPixmap(QPixmap('picture/image_tools/Disconnect.png'))
+                self.lbConnectImage.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'Disconnect.png'))
                 self.lbConnectImage.setScaledContents(True)
                 self.flagConnect = False
                 print('Closed serial port')
@@ -250,7 +252,7 @@ class UI(QMainWindow):
                         self.lbDisplayCity.setText(ls[3])
                         self.lbDisplayCountry.setText(ls[4])
                         self.lbViewUser.setScaledContents(True)
-                        self.lbViewUser.setPixmap(QPixmap(ls[5]))
+                        self.lbViewUser.setPixmap(QPixmap(ls[6]))
 
                     else:
                         pass
@@ -287,15 +289,16 @@ class UI(QMainWindow):
             self.tableWidget.setRowCount(4)  
     
             # Column count 
-            self.tableWidget.setColumnCount(5)   
+            self.tableWidget.setColumnCount(6)   
     
             self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
             self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
             self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
             self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
             self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
+            self.tableWidget.setItem(0, 5, QTableWidgetItem("Time"))
 
-            #Table will fit the screen horizontally 
+            # Table will fit the screen horizontally 
             self.tableWidget.horizontalHeader().setStretchLastSection(True) 
             self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
 
@@ -375,15 +378,18 @@ class UI(QMainWindow):
         self.address = self.textAddress.toPlainText()
         self.city = self.textCity.toPlainText()
         self.country = self.textCountry.toPlainText()
+        self.timeRegister = get_current_time()
+
         idRaw = self.lbID.text()
         lenIdRaw = len(idRaw)
         self.idUser = idRaw[6: lenIdRaw]
-
+        
         print('user name: ', self.name)
         print('user address: ', self.address)
         print('user city: ', self.city)
         print('user country: ', self.country)
         print('id user: ', self.idUser)
+        print('current_time', self.timeRegister)
         print('user imagepath: ', self.imagePath)
 
         # check the conditions needs to save data of user, 
@@ -410,9 +416,10 @@ class UI(QMainWindow):
                 msg.setDefaultButton(QMessageBox.Yes)
                 x = msg.exec_() # execute the message
                 if x == QMessageBox.Yes:
-                    pass
+                    pass    
                     # TODO: Edit data on database
             else:
+                # User doest't register yet
                 if len(self.name) == 0 and len(self.address) == 0 \
                     and len(self.city) == 0 and len(self.country) == 0:
                     print("Not eligible for registration because the textbox yet fill out")
@@ -446,7 +453,7 @@ class UI(QMainWindow):
 
                 else:
                     # User does't register yet
-                    status = self.user.insertData(self.name, self.idUser, self.address, self.city, self.country, self.imagePath)
+                    status = self.user.insertData(self.name, self.idUser, self.address, self.city, self.country,self.timeRegister, self.imagePath)
                     if status == mysql_query_status['INSET_OK']:
                         msg = QMessageBox() 
                         msg.setWindowTitle("Information")
@@ -474,7 +481,7 @@ class UI(QMainWindow):
         self.textCountry.setText('')
         self.lbID.setText('ID    _________')
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
-        self.btnBrowseImage.setIcon(QtGui.QIcon('picture/image_tools/Click_to_browse.png'))
+        self.btnBrowseImage.setIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'Click_to_browse.png'))
         self.imagePath = ''
 
     def browseImageUser(self):
