@@ -68,21 +68,21 @@ dictConnect = {
 }
 
 
-try:
-    conn = mysql.connector.connect(**dictConnect)
-    print(conn)
+# try:
+#     conn = mysql.connector.connect(**dictConnect)
+#     print(conn)
 
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Something is wrong with your user name or password")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("Database does not exist")
-    else:
-        print(err)
+# except mysql.connector.Error as err:
+#     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+#         print("Something is wrong with your user name or password")
+#     elif err.errno == errorcode.ER_BAD_DB_ERROR:
+#         print("Database does not exist")
+#     else:
+        # print(err)
 
 
 # Create a cursor object 
-myCursor = conn.cursor()
+# myCursor = conn.cursor()
 
 # # executing cursor
 # myCursor.execute('SELECT id, name, dept FROM geeksdemo')
@@ -100,7 +100,7 @@ myCursor = conn.cursor()
 # conn.commit() 
 
 # Closing cursor connection
-myCursor.close()
+# myCursor.close()
 
 # closing connection object
-conn.close()
+# conn.close()

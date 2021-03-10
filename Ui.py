@@ -8,6 +8,7 @@ from PyQt5.uic import loadUi
 from smart_util import *
 from serial_attendance import *
 from user_infor import *
+from face_attendance import *
 
 
 listPort = []
@@ -41,6 +42,9 @@ class UI(QMainWindow):
 
         # Creating class user information
         self.user = UserInfor()
+
+        # Creating class face recognition
+        self.faceRecognition = RecognitionUser()
 
         # *********************************************************
         # setting the visible elements 
@@ -78,7 +82,7 @@ class UI(QMainWindow):
         # For register / Edit user data
         self.btnEditData.clicked.connect(self.registerUserData)
         self.btnScanRegister.clicked.connect(self.scanTagsUserRegister)
-        self.btnBrowseImage.clicked.connect(self.browseImageUser)
+        self.btnBrowseImage.clicked.connect(self.browseImageUserAndTrain)
         self.btnClearDataInput.clicked.connect(self.clearDisplayData)
         self.btnSaveDataUser.clicked.connect(self.saveRegisterUser)
 
@@ -366,6 +370,11 @@ class UI(QMainWindow):
                     for i in range(len(receiveData)):
                         self.dataDisplay += '{0:x}'.format(receiveData[i])
                         self.lbID.setText('ID    ' + self.dataDisplay)
+
+                    idRaw = self.lbID.text()
+                    lenIdRaw = len(idRaw)
+                    self.idUser = idRaw[6: lenIdRaw]
+                    
             # Disable lable loading
             self.lbReadingTag.setVisible(False)  
             self.grapViewImgReadingTag.setVisible(False)
@@ -380,9 +389,6 @@ class UI(QMainWindow):
         self.country = self.textCountry.toPlainText()
         self.timeRegister = get_current_time()
 
-        idRaw = self.lbID.text()
-        lenIdRaw = len(idRaw)
-        self.idUser = idRaw[6: lenIdRaw]
         
         print('user name: ', self.name)
         print('user address: ', self.address)
@@ -484,16 +490,34 @@ class UI(QMainWindow):
         self.btnBrowseImage.setIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'Click_to_browse.png'))
         self.imagePath = ''
 
-    def browseImageUser(self):
-        # Choose the image file for the user data
-        filename = QFileDialog.getOpenFileName()
-        self.imagePath = filename[0]
-        print(self.imagePath)
-        # self.imagePath = os.path.split(imagePath)[-1]
+    def browseImageUserAndTrain(self):
+        # # Choose the image file for the user data
+        # filename = QFileDialog.getOpenFileName()
+        # self.imagePath = filename[0]
+        # print(self.imagePath)
+        # # self.imagePath = os.path.split(imagePath)[-1]
 
-        # display the image to button
-        self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
-        self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
+        if self.lbID.text() == 'ID    _________':
+            print("Not eligible for registration because the id user yet scan") 
+            msg = QMessageBox() 
+            msg.setWindowTitle("Information")
+            msg.setText("Please click the scan button to have the code tags!!!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setDefaultButton(QMessageBox.Ok)
+            x = msg.exec_() # execute the message
+        else:
+            self.imagePath = self.faceRecognition.getDataSet(self.idUser)
+
+            # display the image to button
+            self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
+            self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
+            
+
+
+
+    def clearDisplayTable(self):
+        self.tableWidget.clear()
 
 
 # =================================================================================================================
