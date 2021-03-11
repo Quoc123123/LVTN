@@ -421,5 +421,15 @@
 # sys.exit(App.exec()) 
 
 
-# from face_attendance import *
-# print(getDataSet('aac'))
+from face_attendance import *
+test = RecognitionUser()
+
+
+test.getDataSet(1)
+# test.trainingUser()
+# test.recognitionUser()
+
+# a = 925423848037
+
+# a = hex(a)
+# print(a)

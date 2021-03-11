@@ -320,67 +320,50 @@ class UI(QMainWindow):
             x = msg.exec_() # execute the message
 
     def scanTagsUserRegister(self):
-        try:
-            # check the status if connected else message box pop not connected 
-            if self.flagConnect:
-                # creating the thread for both animation and receive the data within wating the scan tags
-                threadReceivedDataFromReader = threading.Thread(target=self.receivedDataFromReader, args=[5])
-                threadReceivedDataFromReader.start()
-            else:
-                threadMessages = threading.Thread(target=speakMessage, args=('Error, please connect again', 1, 1, 1))
-                threadMessages.start()
-        except:
-            print('Cannot scan rfid card')
-            msg = QMessageBox() 
-            msg.setWindowTitle("Warning")
-            msg.setText("Cannot scan rfid card!!!")
-            msg.setIcon(QMessageBox.Warning)
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setDefaultButton(QMessageBox.Ok)
-            x = msg.exec_() # execute the message 
+        # self.lbReadingTag.setVisible(True)  
+        # self.grapViewImgReadingTag.setVisible(True)
+        # self.btnCloseTag.setVisible(True)
+        # self.lbLoading.setVisible(True)
+
+        self.receivedDataFromReader(5)
 
     def receivedDataFromReader(self, timeout):
-        self.lbReadingTag.setVisible(True)  
-        self.grapViewImgReadingTag.setVisible(True)
-        self.btnCloseTag.setVisible(True)
-        self.lbLoading.setVisible(True)
-
-        self.semaphoreRegister.release()
-        
         start_time = time.time()
+
         while True:
-            # calling accquire method
-            self.semaphoreRegister.acquire()
-            while self.flagRegister:
-                self.mutexLock.acquire()
-                checkData = self.ser.check_data_from_device()
-                receiveData = self.ser.get_data_from_device()
-                # Exit critical section
-                self.mutexLock.release()
+            if time.time() - start_time > timeout:
+                print("timeout") 
+                msg = QMessageBox() 
+                msg.setWindowTitle("Information")
+                msg.setText("Receive timeout!!!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setDefaultButton(QMessageBox.Ok)
+                x = msg.exec_() # execute the message
+                break
 
-                if checkData > 0:
-                    # Disable lable loading
-                    self.lbReadingTag.setVisible(False)  
-                    self.grapViewImgReadingTag.setVisible(False)
-                    self.btnCloseTag.setVisible(False)
-                    self.lbLoading.setVisible(False)
+            checkData = self.ser.check_data_from_device()
+            receiveData = self.ser.get_data_from_device()
 
-                    # Processing receive data
-                    self.dataDisplay = ''
-                    for i in range(len(receiveData)):
-                        self.dataDisplay += '{0:x}'.format(receiveData[i])
-                        self.lbID.setText('ID    ' + self.dataDisplay)
+            if checkData > 0:
+                # Processing receive data
+                self.dataDisplay = ''
+                for i in range(len(receiveData)):
+                    self.dataDisplay += '{0:x}'.format(receiveData[i])
+                self.lbID.setText('ID    ' + self.dataDisplay)
 
-                    idRaw = self.lbID.text()
-                    lenIdRaw = len(idRaw)
-                    self.idUser = idRaw[6: lenIdRaw]
-                    
-            # Disable lable loading
-            self.lbReadingTag.setVisible(False)  
-            self.grapViewImgReadingTag.setVisible(False)
-            self.btnCloseTag.setVisible(False)
-            self.lbLoading.setVisible(False)
+                idRaw = self.lbID.text()
+                lenIdRaw = len(idRaw)
+                self.idUser = idRaw[6: lenIdRaw]
 
+                # Disable lable loading
+                self.lbReadingTag.setVisible(False)  
+                self.grapViewImgReadingTag.setVisible(False)
+                self.btnCloseTag.setVisible(False)
+                self.lbLoading.setVisible(False)
+                break
+            
+                
     def saveRegisterUser(self):
         # fetch the element data from UI
         self.name = self.textName.toPlainText()
@@ -508,6 +491,7 @@ class UI(QMainWindow):
             x = msg.exec_() # execute the message
         else:
             self.imagePath = self.faceRecognition.getDataSet(self.idUser)
+            # self.faceRecognition.trainingUser()
 
             # display the image to button
             self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())

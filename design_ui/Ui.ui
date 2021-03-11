@@ -70,7 +70,7 @@
      </font>
     </property>
     <property name="text">
-     <string>User Data</string>
+     <string>Attendance</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnConnection">
@@ -256,7 +256,7 @@
      <widget class="QGroupBox" name="groupBoxImg_4">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>370</x>
         <y>20</y>
         <width>401</width>
         <height>371</height>
@@ -481,34 +481,70 @@
         <string>Country        :</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="btnClear">
-       <property name="geometry">
-        <rect>
-         <x>600</x>
-         <y>310</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-         <stylestrategy>PreferDefault</stylestrategy>
-        </font>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>Clear</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-      </widget>
+     </widget>
+     <widget class="QRadioButton" name="radioSearchName_2">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>30</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Search by name</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioSearchName_3">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>110</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Search by name</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnClear">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>200</y>
+        <width>121</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <stylestrategy>PreferDefault</stylestrategy>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
      </widget>
      <widget class="QGroupBox" name="groupBoxImageID">
       <property name="geometry">
