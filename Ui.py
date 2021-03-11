@@ -350,6 +350,8 @@ class UI(QMainWindow):
                 self.dataDisplay = ''
                 for i in range(len(receiveData)):
                     self.dataDisplay += '{0:x}'.format(receiveData[i])
+
+                self.dataDisplay = str(int(self.dataDisplay, 16))
                 self.lbID.setText('ID    ' + self.dataDisplay)
 
                 idRaw = self.lbID.text()

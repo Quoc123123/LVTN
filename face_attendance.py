@@ -7,12 +7,10 @@ import os
 path = 'dataset'
 
 # loads the "classifier"
-detector = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
-faceCascade = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
-
-recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read('trainer/trainer.yml')
 cascadePath = 'Data/haarcascade_frontalface_default.xml'
+detector = cv2.CascadeClassifier(cascadePath)
+
+
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -56,6 +54,7 @@ class RecognitionUser():
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
             # classifier function
+            faceCascade = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
             faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.3, minNeighbors = 5)
 
             for(x, y, w, h) in faces:
@@ -98,8 +97,7 @@ class RecognitionUser():
         for imagePath in imagePaths:
             PIL_img = Image.open(imagePath).convert('L') # convert it to grayscale
             img_numpy = np.array(PIL_img, 'uint8')
-            id = os.path.split(imagePath)[-1].split('.')[1]
-            id = self.convertStringToInt(id)
+            id = int(os.path.split(imagePath)[-1].split('.')[1])
             print('ID: ', id)
             faces = detector.detectMultiScale(img_numpy)
             for(x, y, w, h) in faces:
@@ -107,14 +105,9 @@ class RecognitionUser():
                 ids.append(id)
         return faceSamples, ids 
 
-
-    def convertStringToInt(self, str):
-        return int(str, 16)
-
-    def convertIntToString(self, num):
-        return hex(num)
-
     def recognitionUser(self):
+        recognizer = cv2.face.LBPHFaceRecognizer_create()
+        recognizer.read('trainer/trainer.yml')
         # initiate id counter
         id = 0
 
@@ -144,12 +137,13 @@ class RecognitionUser():
                         (centerW + sizeboxW // 2, centerH + sizeboxH // 2), (255, 255, 255), 5)
 
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faceCascade = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
             faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.3, minNeighbors = 5,  minSize = (int(minW), int(minH)))
 
             for(x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h, x:x+w])
-                print(id)
+                print(str(id))
 
                 # Check if confidence is less them 100 ==> '0' is perfect match
                 if(confidence < 100):

@@ -422,14 +422,20 @@
 
 
 from face_attendance import *
+import time
+
 test = RecognitionUser()
 
 
-test.getDataSet(1)
-# test.trainingUser()
-# test.recognitionUser()
+test.getDataSet('456456')
+test.trainingUser()
+test.recognitionUser()
 
 # a = 925423848037
 
-# a = hex(a)
-# print(a)
+
+# print(str(1234))
+
+# a = 'd7778f4a65'
+
+# print('')
