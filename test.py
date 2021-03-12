@@ -427,7 +427,7 @@ import time
 test = RecognitionUser()
 
 
-test.getDataSet('456456')
+# test.getDataSet('987654321')
 test.trainingUser()
 test.recognitionUser()
 

@@ -77,6 +77,8 @@ class UI(QMainWindow):
 
         # For User Data
         self.btnUserData.clicked.connect(self.userData)
+        
+        self.btnFaceRecognition.clicked.connect(self.recognitionUser)
         self.btnClear.clicked.connect(self.clearDataUser)
 
         # For register / Edit user data
@@ -114,8 +116,9 @@ class UI(QMainWindow):
         # show init UI
         self.show()
         
-# ******************************************************************************************************************
-# ******************************************************************************************************************
+# =================================================================================================================
+# Utils for the display
+# =================================================================================================================
     # add listport into ComboBox
     def addComPortBaudrate(self):
         # add comport
@@ -151,8 +154,6 @@ class UI(QMainWindow):
                 self.flagBlinkConnect = True
                 self.lbConnectImage.setPixmap(QPixmap(''))
 
-# ******************************************************************************************************************
-# ******************************************************************************************************************
     # connect to port from Combobox
     def connectComport(self):
         try:
@@ -211,13 +212,11 @@ class UI(QMainWindow):
 
             self.flagRegister = False
             self.flagUserData = True
-            self.semaphoreUserData.release()
+            
+            # set default that using card to recognition user
+            self.radioUsingCard.setChecked(True)
 
-            # Creating thread to scan data from the reader system
-            self.threadScanTags = threading.Thread(target=self.scanTagsUserData, args=[])
-            # Read card and commpare with previously stored data 
-            self.threadScanTags.start()
-        else:
+        else: 
             print("Not into user data mode if doesn't yet connect")
             msg = QMessageBox() 
             msg.setWindowTitle("information")
@@ -227,40 +226,57 @@ class UI(QMainWindow):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
-    def scanTagsUserData(self):
-        while True:
-            self.semaphoreUserData.acquire()
-            while self.flagUserData:
-                # Enter into critical section
-                self.mutexLock.acquire()
+    def recognitionUser(self):
+        if self.radioUsingCard.isChecked():
+            self.scanTagsUserData(5)
+        else:
+            self.recognitionUser.recognitionUser()
+    
+    def scanTagsUserData(self, timeout):
+        start_time = time.time()
+        while(True):
+            if time.time() - start_time > timeout:
+                print('Scan tags recogniton received  timeout')
+                msg = QMessageBox() 
+                msg.setWindowTitle("information")
+                msg.setText("received timeout!!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setDefaultButton(QMessageBox.Ok)
+                x = msg.exec_() # execute the message
+                break 
 
-                checkData = self.ser.check_data_from_device()
-                receiveData = self.ser.get_data_from_device()
-                
-                # Exit critical section
-                self.mutexLock.release()
+            checkData = self.ser.check_data_from_device()
+            receiveData = self.ser.get_data_from_device()
+            
+            if checkData > 0:
+                # Processing receive data
+                self.dataDisplay = ''
+                for i in range(len(receiveData) - 2):
+                    self.dataDisplay += '{0:x}'.format(receiveData[i])
+                self.dataDisplay = str(int(self.dataDisplay, 16))
+                self.lbIDUserData.setText('ID: ' + self.dataDisplay)
 
-                if checkData > 0:
-                    # Processing receive data
-                    self.dataDisplay = ''
-                    for i in range(len(receiveData)):
-                        self.dataDisplay += '{0:x}'.format(receiveData[i])
-                        self.lbIDUserData.setText('ID: ' + self.dataDisplay)
-
-                    id = self.lbIDUserData.text()[4:]
-                    if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
-                        ls = self.user.getDataUser(id)
-                        self.lbDisplayName.setText(ls[0])
-                        self.lbIDUserData.setText('ID: ' + ls[1])
-                        self.lbDisplayAddress.setText(ls[2])
-                        self.lbDisplayCity.setText(ls[3])
-                        self.lbDisplayCountry.setText(ls[4])
-                        self.lbViewUser.setScaledContents(True)
-                        self.lbViewUser.setPixmap(QPixmap(ls[6]))
-
-                    else:
-                        pass
-                        #TODO: Display the message user doesn't register yet
+                id = self.lbIDUserData.text()[4: len(self.lbIDUserData.text())]
+                if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
+                    ls = self.user.getDataUser(id)
+                    self.lbDisplayName.setText(ls[0])
+                    self.lbIDUserData.setText('ID: ' + ls[1])
+                    self.lbDisplayAddress.setText(ls[2])
+                    self.lbDisplayCity.setText(ls[3])
+                    self.lbDisplayCountry.setText(ls[4])
+                    self.lbViewUser.setScaledContents(True)
+                    self.lbViewUser.setPixmap(QPixmap(ls[6]))
+                else:
+                    # Display the message user doesn't register yet
+                    msg = QMessageBox() 
+                    msg.setWindowTitle("information")
+                    msg.setText("User doesn't exits, please register!!")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.setDefaultButton(QMessageBox.Ok)
+                    x = msg.exec_() # execute the message
+                break
 
     def clearDataUser(self):
         self.lbDisplayName.setText('Waiting...')
@@ -332,7 +348,7 @@ class UI(QMainWindow):
 
         while True:
             if time.time() - start_time > timeout:
-                print("timeout") 
+                print("received timeout") 
                 msg = QMessageBox() 
                 msg.setWindowTitle("Information")
                 msg.setText("Receive timeout!!!")
@@ -348,7 +364,7 @@ class UI(QMainWindow):
             if checkData > 0:
                 # Processing receive data
                 self.dataDisplay = ''
-                for i in range(len(receiveData)):
+                for i in range(len(receiveData) - 2):
                     self.dataDisplay += '{0:x}'.format(receiveData[i])
 
                 self.dataDisplay = str(int(self.dataDisplay, 16))
@@ -441,7 +457,7 @@ class UI(QMainWindow):
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.setDefaultButton(QMessageBox.Ok)
                     x = msg.exec_() # execute the message
-
+                    
                 else:
                     # User does't register yet
                     status = self.user.insertData(self.name, self.idUser, self.address, self.city, self.country,self.timeRegister, self.imagePath)
@@ -493,14 +509,11 @@ class UI(QMainWindow):
             x = msg.exec_() # execute the message
         else:
             self.imagePath = self.faceRecognition.getDataSet(self.idUser)
-            # self.faceRecognition.trainingUser()
+            self.faceRecognition.trainingUser()
 
             # display the image to button
             self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
             self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
-            
-
-
 
     def clearDisplayTable(self):
         self.tableWidget.clear()

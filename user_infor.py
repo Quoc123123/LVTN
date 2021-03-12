@@ -384,7 +384,7 @@ class UserInfor:
         
         
     def getDataUser(self, ID):
-        try:
+        try: 
             self.myDatabase = mysql.connector.connect(**dictConnect)
             print(self.myDatabase)
             self.myCursor = self.myDatabase.cursor()
@@ -399,7 +399,7 @@ class UserInfor:
                     print('exist data user: {}'.format(row[:-1]))
                     self.mysqlDisconnect()
                     ls = list(row[:-1])
-                    file_image = 'picture/image_save/{}_{}_{}'.format(ls[0], ls[1], ls[5])
+                    file_image = 'picture/image_save/{}_{}'.format(ls[1], ls[5])
                     self.writeFile(row[6], file_image)
                     ls.append(file_image)
                     print(ls)

@@ -3,17 +3,18 @@ import cv2
 from PIL import Image
 import os
 
+
+
+SAMPLE_NUMBER = 30
+
+
 # Path for face image database
 path = 'dataset'
 
 # loads the "classifier"
 cascadePath = 'Data/haarcascade_frontalface_default.xml'
 detector = cv2.CascadeClassifier(cascadePath)
-
-
-
 font = cv2.FONT_HERSHEY_SIMPLEX
-
 
 class RecognitionUser():
     def __init__(self):
@@ -36,8 +37,9 @@ class RecognitionUser():
             ret, img = cap.read()
             img = cv2.flip(img, 1) # Flip camera vertically
             
-            if(count == 15):
-                imagepath = 'picture/image_user/User.' + face_id  + '.jpg'
+            # Take a image for display purpose
+            if(count == SAMPLE_NUMBER / 2):
+                imagepath = 'picture/image_user/User.' + face_id  + '.png'
                 print('[INFO] The image user register', imagepath)
                 cv2.imwrite(imagepath, img)
 
@@ -60,14 +62,14 @@ class RecognitionUser():
             for(x, y, w, h) in faces:
                 cv2.rectangle(img, (x,y), (x+w, w+h), (255, 0, 0), 2)
                 count += 1
-                cv2.imwrite('dataset/User.' + face_id + '.' + str(count) + '.jpg', gray[y:y+h, x:x+w])
+                cv2.imwrite('dataset/User.' + face_id + '.' + str(count) + '.png', gray[y:y+h, x:x+w])
 
             cv2.imshow('video', img)
             
             k = cv2.waitKey(100) & 0xff
             if k == 27: # press 'ESC' to quit
                 break
-            elif count >= 30: # take 30 face sample and stop video
+            elif count >= SAMPLE_NUMBER: # take 30 face sample and stop video
                 break
         # Do a bit cleanup
         print('[INFO] Exiting Program and cleanup stuff')
@@ -77,9 +79,9 @@ class RecognitionUser():
         return imagepath
 
     def trainingUser(self):
-        recognizer = cv2.face.LBPHFaceRecognizer_create()
-
         print('[INFO] Traning faces. It will take a few seconds. Wait ...')
+        # 
+        recognizer = cv2.face.LBPHFaceRecognizer_create()
         faces, ids = self.getImagesAndLabels(path)
         recognizer.train(faces, np.array(ids))
 
@@ -108,12 +110,9 @@ class RecognitionUser():
     def recognitionUser(self):
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read('trainer/trainer.yml')
+
         # initiate id counter
         id = 0
-
-        # names related to ids: example ==> Marcelo: id = 1, ...
-
-        names = ['None', 'QuocBrave', 'Marcelo']
 
         # Initialize and start realine video capture
         cam = cv2.VideoCapture(0)
@@ -137,7 +136,7 @@ class RecognitionUser():
                         (centerW + sizeboxW // 2, centerH + sizeboxH // 2), (255, 255, 255), 5)
 
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            faceCascade = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
+            faceCascade = cv2.CascadeClassifier(cascadePath)
             faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.3, minNeighbors = 5,  minSize = (int(minW), int(minH)))
 
             for(x, y, w, h) in faces:
