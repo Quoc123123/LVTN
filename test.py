@@ -421,15 +421,19 @@
 # sys.exit(App.exec()) 
 
 
-from face_attendance import *
-import time
+# from face_attendance import *
+# import time
 
-test = RecognitionUser()
+# test = RecognitionUser()
 
 
-# test.getDataSet('987654321')
-test.trainingUser()
-test.recognitionUser()
+# # test.getDataSet('987654321')
+# # test.trainingUser()
+# a = test.recognitionUser(5)
+# print(a)
+# print(type(a[0]))
+# print(type(a[1]))
+
 
 # a = 925423848037
 
@@ -439,3 +443,49 @@ test.recognitionUser()
 # a = 'd7778f4a65'
 
 # print('')
+
+# import logging 
+  
+# #Create and configure logger 
+# logging.basicConfig(filename="newfile.log", 
+#                     format='%(asctime)s %(message)s', 
+#                     filemode='w') 
+  
+# #Creating an object 
+# logger=logging.getLogger() 
+  
+# #Setting the threshold of logger to DEBUG 
+# logger.setLevel(logging.DEBUG) 
+  
+# #Test messages 
+# logger.debug("Harmless debug Message") 
+# logger.info("Just an information") 
+# logger.warning("Its a Warning") 
+# logger.error("Did you try to divide by zero") 
+# logger.critical("Internet is down") 
+
+# import datetime
+# import time
+# import os
+
+# import pandas as pd
+
+# col_names = ['Id', 'Name', 'Date', 'Time']
+# attendance = pd.DataFrame(columns=col_names)
+
+# # ts = time.time()
+# # date = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+# # timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+# attendance.loc[len(attendance)] = ['1', '2','3', '4']
+
+
+# ts = time.time()
+# date = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+# timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+# Hour, Minute, Second = timeStamp.split(":")
+# fileName = "Attendance"+os.sep+"Attendance_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
+# attendance.to_csv(fileName, index=False)
+from user_infor import *
+
+test = UserInfor()
+test.getNumberUser()

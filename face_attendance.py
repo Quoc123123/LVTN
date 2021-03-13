@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 from PIL import Image
 import os
+import time
 
 
 
@@ -57,7 +58,7 @@ class RecognitionUser():
 
             # classifier function
             faceCascade = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
-            faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.3, minNeighbors = 5)
+            faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5)
 
             for(x, y, w, h) in faces:
                 cv2.rectangle(img, (x,y), (x+w, w+h), (255, 0, 0), 2)
@@ -107,12 +108,14 @@ class RecognitionUser():
                 ids.append(id)
         return faceSamples, ids 
 
-    def recognitionUser(self):
+    def recognitionUser(self, timeout):
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read('trainer/trainer.yml')
 
         # initiate id counter
         id = 0
+        confidence = 0
+
 
         # Initialize and start realine video capture
         cam = cv2.VideoCapture(0)
@@ -122,6 +125,8 @@ class RecognitionUser():
         # Define min window size to be recognized as a face
         minW = 0.1*cam.get(3)
         minH = 0.1*cam.get(4)
+
+        start_time = time.time()
 
         while True:
             # read image from camera
@@ -137,36 +142,46 @@ class RecognitionUser():
 
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             faceCascade = cv2.CascadeClassifier(cascadePath)
-            faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.3, minNeighbors = 5,  minSize = (int(minW), int(minH)))
+            faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5,  minSize = (int(minW), int(minH)))
 
             for(x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h, x:x+w])
-                print(str(id))
+                print('Face recognition id: {} - Confidence: {}'.format(id, confidence))
 
                 # Check if confidence is less them 100 ==> '0' is perfect match
                 if(confidence < 100):
-                    #TODO: loading data from database and compare the user
-                    # id = names[id]
-                    confidence = '{0}%'.format(round(100 - confidence))
+                    # confidence = '{0}%'.format(round(100 - confidence))
+                    confidence = round(100 - confidence)
                     cv2.putText(img, str(id), (x, y+h+30), font, 1, (0, 255, 0), 2)
                 else:
-                    id = 'Name: Unknown'
-                    confidence = '{0}%'.format(round(100 - confidence))
-                    cv2.putText(img, str(id), (x, y+h+30), font, 1, (255, 0, 0), 2)
+                    # confidence = '{0}%'.format(round(100 - confidence))
+                    confidence = round(100 - confidence)
+                    cv2.putText(img, 'Name: Unknown', (x, y+h+30), font, 1, (255, 0, 0), 2)
+                    print('Name: Unknown')
 
-                print(confidence)
+            # Check the timeout
+            if time.time() - start_time > timeout:
+                print("[INFO] Exiting Program and cleanup stuff")
+                
+                # Do a bit of cleanup
+                cam.release()
+                cv2.destroyAllWindows()
+                return str(id), str(confidence)
+                break
+            
 
             cv2.imshow('camera', img)
+            cv2.waitKey(10)
+            # print("[INFO] Exiting Program and cleanup stuff")
+            # # Do a bit of cleanup
+            # cam.release()
+            # cv2.destroyAllWindows()
+          
+            # k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
+            # if k == 27:
+            #     break
 
-            k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
-            if k == 27:
-                break
-
-        # Do a bit of cleanup
-        print("[INFO] Exiting Program and cleanup stuff")
-        cam.release()
-        cv2.destroyAllWindows()
 
 
         

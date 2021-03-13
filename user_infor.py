@@ -317,8 +317,12 @@ class UserInfor:
             print('Connecting successfully')
 
             # get number rows in a table and give your table
-            query = 'SELECT *  FROM {}'.format(TABLE_NAME)
-            number_of_rows = self.myCursor.execute(query)
+            query = 'SELECT * FROM {}'.format(TABLE_NAME)
+            self.myCursor.execute(query)
+
+            # get number rows of table
+            self.myCursor.fetchall()
+            number_of_rows = self.myCursor.rowcount
             print(number_of_rows)
             return number_of_rows
 

@@ -20,7 +20,6 @@ PATH_IMAGE_SAVE = 'picture/image_save/'
 
 
 
-
 # ******************************************************************************************************************
 # PageOne of UI  
 # ******************************************************************************************************************
@@ -111,7 +110,12 @@ class UI(QMainWindow):
         self.country = ''
         self.timeRegister = ''
         self.imagePath = ''
+
         
+        # The variable contains the amount of data registerd 
+        self.numUserRegister = 0
+
+
 
         # show init UI
         self.show()
@@ -230,8 +234,30 @@ class UI(QMainWindow):
         if self.radioUsingCard.isChecked():
             self.scanTagsUserData(5)
         else:
-            self.recognitionUser.recognitionUser()
+            self.recognitionUser()
     
+    def recognitionUser(self):
+        id, confidence = self.faceRecognition.recognitionUser(5)
+        if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
+            ls = self.user.getDataUser(id)
+            self.lbDisplayName.setText(ls[0])
+            self.lbIDUserData.setText('ID: ' + ls[1])
+            self.lbDisplayAddress.setText(ls[2])
+            self.lbDisplayCity.setText(ls[3])
+            self.lbDisplayCountry.setText(ls[4])
+            self.lbViewUser.setScaledContents(True)
+            self.lbViewUser.setPixmap(QPixmap(ls[6]))
+
+        else:
+            # Display the message user doesn't register yet
+            msg = QMessageBox() 
+            msg.setWindowTitle("information")
+            msg.setText("User doesn't exits, please register!!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setDefaultButton(QMessageBox.Ok)
+            x = msg.exec_() # execute the message
+
     def scanTagsUserData(self, timeout):
         start_time = time.time()
         while(True):
@@ -290,40 +316,51 @@ class UI(QMainWindow):
 # Processing for Register / Edit User
 # =================================================================================================================
     def registerUserData(self):
-        if self.flagConnect:
-            # setting multi-media for the display 
-            self.lb_select.setGeometry(-10, 460, 51, 61)
-            self.groupBoxConnection.setVisible(True)
-            self.groupBoxUserData.setVisible(True) 
-            self.groupBoxImageID.setVisible(True)
-            
-            self.lbReadingTag.setVisible(False)  
-            self.grapViewImgReadingTag.setVisible(False)
-            self.btnCloseTag.setVisible(False)
-            self.lbLoading.setVisible(False)
+        if self.flagConnect: 
+            if self.user.mysqlConnection():
+                # loading  the number of user on database
+                self.numUserRegister = self.user.getNumberUser()
 
-            self.clearDisplayData()
-            self.radioSearchName.setChecked(True)
+                # setting multi-media for the display 
+                self.lb_select.setGeometry(-10, 460, 51, 61)
+                self.groupBoxConnection.setVisible(True)
+                self.groupBoxUserData.setVisible(True) 
+                self.groupBoxImageID.setVisible(True)
 
-            # Row count 
-            self.tableWidget.setRowCount(4)  
-    
-            # Column count 
-            self.tableWidget.setColumnCount(6)   
-    
-            self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
-            self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
-            self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
-            self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
-            self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
-            self.tableWidget.setItem(0, 5, QTableWidgetItem("Time"))
+                self.lbReadingTag.setVisible(False)  
+                self.grapViewImgReadingTag.setVisible(False)
+                self.btnCloseTag.setVisible(False)
+                self.lbLoading.setVisible(False)
 
-            # Table will fit the screen horizontally 
-            self.tableWidget.horizontalHeader().setStretchLastSection(True) 
-            self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
+                self.clearDisplayData()
+                self.radioSearchName.setChecked(True)
 
-            self.flagRegister = True
-            self.flagUserData = False
+                # Row count 
+                self.tableWidget.setRowCount(self.numUserRegister)  
+
+                # Column count 
+                self.tableWidget.setColumnCount(6)   
+
+                self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
+                self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
+                self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
+                self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
+                self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
+                self.tableWidget.setItem(0, 5, QTableWidgetItem("Time"))
+
+                # Table will fit the screen horizontally 
+                self.tableWidget.horizontalHeader().setStretchLastSection(True) 
+                self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
+                
+            else:
+                print("error connecting to the server")
+                msg = QMessageBox() 
+                msg.setWindowTitle("information")
+                msg.setText("Error conneting to the server, plesse check the newwork connection!!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setDefaultButton(QMessageBox.Ok)
+                x = msg.exec_() # execute the message
             
         else:
             print("Not into Register/Edit User data mode if doesn't yet connect")

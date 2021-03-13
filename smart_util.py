@@ -55,52 +55,15 @@ def get_current_time():
     time_now = now.strftime("%m_%d_%Y_%H_%M_%S")
     return time_now
 
+
+
 #===============================================================================
-# Connect with database
+# creating the title bar function
 #===============================================================================
+def title_bar(): 
+    os.system('cls') # for windows
 
-dictConnect = {
-    'host' : 'localhost',
-    'user' : 'root',
-    'password' : '',
-    'database' : 'geeksdemo',
-    'port' : 3307,    
-}
-
-
-# try:
-#     conn = mysql.connector.connect(**dictConnect)
-#     print(conn)
-
-# except mysql.connector.Error as err:
-#     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-#         print("Something is wrong with your user name or password")
-#     elif err.errno == errorcode.ER_BAD_DB_ERROR:
-#         print("Database does not exist")
-#     else:
-        # print(err)
-
-
-# Create a cursor object 
-# myCursor = conn.cursor()
-
-# # executing cursor
-# myCursor.execute('SELECT id, name, dept FROM geeksdemo')
-
-# # Display all records 
-# table = myCursor.fetchall()
-# print('table', table)
-
-# # Describe table
-# print('\n Table Description:')
-# for attr in table:
-#     print(attr)
-
-# myCursor.execute("INSERT INTO geeksdemo (id, name, gender, dept) VALUES (12,'Shoit','abc', 'ML')")
-# conn.commit() 
-
-# Closing cursor connection
-# myCursor.close()
-
-# closing connection object
-# conn.close()
+    # Title of the program
+    print("\t**********************************************")
+    print("\t***** Face And Tags Recognition Attendance System *****")
+    print("\t**********************************************")
