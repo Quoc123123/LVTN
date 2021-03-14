@@ -93,7 +93,7 @@ class SerialComm:
     # Receive Async Data    
     # ******************************************************************************************************************
 
-    def check_data_from_device(self):
+    def get_data_from_device(self):
         ret = 0
         # receive data from serial port
         if self.ser.inWaiting():
@@ -128,10 +128,7 @@ class SerialComm:
                     self.rfid_header = headerFrame['NO_RFID_HEADER']
                     self.receive_data = b''
                     self.received_idx = 0
-        return ret          
-
-    def get_data_from_device(self): 
-        return self.return_data 
+        return ret, self.return_data       
 
     # ******************************************************************************************************************
     # Send Async Data    

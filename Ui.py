@@ -234,9 +234,9 @@ class UI(QMainWindow):
         if self.radioUsingCard.isChecked():
             self.scanTagsUserData(5)
         else:
-            self.recognitionUser()
+            self.usingFaceRecogniton()
     
-    def recognitionUser(self):
+    def usingFaceRecogniton(self):
         id, confidence = self.faceRecognition.recognitionUser(5)
         if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
             ls = self.user.getDataUser(id)
@@ -272,8 +272,7 @@ class UI(QMainWindow):
                 x = msg.exec_() # execute the message
                 break 
 
-            checkData = self.ser.check_data_from_device()
-            receiveData = self.ser.get_data_from_device()
+            checkData, receiveData = self.ser.get_data_from_device()
             
             if checkData > 0:
                 # Processing receive data
@@ -376,8 +375,7 @@ class UI(QMainWindow):
                 x = msg.exec_() # execute the message
                 break
 
-            checkData = self.ser.check_data_from_device()
-            receiveData = self.ser.get_data_from_device()
+            checkData, receiveData = self.ser.get_data_from_device()
 
             if checkData > 0:
                 # Processing receive data
@@ -519,23 +517,22 @@ class UI(QMainWindow):
                     oldUser = self.user.getDataUser(self.idUser)
                     if oldUser[0] != self.name:
                         print('updating name for the user')
-                        status = self.user.updateUser(self.idUser, table_columns_elements[0], self.name)
+                        self.user.updateUser(self.idUser, table_columns_elements[0], self.name)
                     if oldUser[2] != self.address:
                         print('updating address for the user')
-                        status = self.user.updateUser(self.idUser, table_columns_elements[2], self.address)
+                        self.user.updateUser(self.idUser, table_columns_elements[2], self.address)
                     if oldUser[3] != self.city:
                         print('updating city for the user')
-                        status = self.user.updateUser(self.idUser, table_columns_elements[3], self.city)
+                        self.user.updateUser(self.idUser, table_columns_elements[3], self.city)
                     if oldUser[4] != self.country:
                         print('updating country for the user')
-                        status = self.user.updateUser(self.idUser, table_columns_elements[4], self.country)
+                        self.user.updateUser(self.idUser, table_columns_elements[4], self.country)
                     print('updating time register for the user')
-                    status = self.user.updateUser(self.idUser, table_columns_elements[5], self.timeRegister)
+                    self.user.updateUser(self.idUser, table_columns_elements[5], self.timeRegister)
                     
-
-
                     # convert flagUpdate
                     self.flagUpdate = False
+                    print('updating for user successfull')
                     
     def clearDisplayData(self):
         self.textName.setText('')
@@ -620,8 +617,6 @@ class UI(QMainWindow):
             self.tableWidget.selectRow(0)
             self.displayImageRegister(0)
             
-
-
     def updateNumberUser(self):
         # loading  the number of user on database
         self.numUserRegister = self.user.getNumberUser()
@@ -655,7 +650,7 @@ class UI(QMainWindow):
         dateRegister = self.tableWidget.item(row, 5).text()
         print('id: {}, date: {} has been taken from table'.format(id, dateRegister))
         self.lbViewRegister.setScaledContents(True)
-        self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.png'.format(id, dateRegister)))
+        self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.jpg'.format(id, dateRegister)))
 
     def creatingListWidget(self):
        pass

@@ -472,7 +472,7 @@ class UserInfor:
 
     def writeFile(self, data, filename):
         # Convert binary data to proper format and write it on Hard Disk
-        with open('{}.png'.format(filename), 'wb') as file:
+        with open('{}.jpg'.format(filename), 'wb') as file:
             file.write(data)
         file.close()
 

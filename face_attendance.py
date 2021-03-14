@@ -40,7 +40,7 @@ class RecognitionUser():
             
             # Take a image for display purpose
             if(count == SAMPLE_NUMBER / 2):
-                imagepath = 'picture/image_user/User.' + face_id  + '.png'
+                imagepath = 'picture/image_user/User.' + face_id  + '.jpg'
                 print('[INFO] The image user register', imagepath)
                 cv2.imwrite(imagepath, img)
 
@@ -63,7 +63,7 @@ class RecognitionUser():
             for(x, y, w, h) in faces:
                 cv2.rectangle(img, (x,y), (x+w, w+h), (255, 0, 0), 2)
                 count += 1
-                cv2.imwrite('dataset/User.' + face_id + '.' + str(count) + '.png', gray[y:y+h, x:x+w])
+                cv2.imwrite('dataset/User.' + face_id + '.' + str(count) + '.jpg', gray[y:y+h, x:x+w])
 
             cv2.imshow('video', img)
             
