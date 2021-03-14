@@ -270,7 +270,7 @@ class UserInfor:
             print('query: ' + query)
             self.myCursor.execute(query)
             record = self.myCursor.fetchone()
-            print(record)
+            print(record[:-1])
 
             # Update single record now
             query = "UPDATE {} SET {} = '{}' WHERE {} = {}".format(TABLE_NAME, columns, value, table_columns_elements[1], id)
@@ -284,8 +284,7 @@ class UserInfor:
             query = 'SELECT *  FROM {} WHERE {} = {}'.format(TABLE_NAME, table_columns_elements[1], id)
             self.myCursor.execute(query)
             record = self.myCursor.fetchone()
-            print(record)
-
+            print(record[:-1])
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print('Error: Something is wrong with your user name or password')
@@ -442,7 +441,7 @@ class UserInfor:
             for row in record: 
                 # print('{} = {}'.format(table_columns_elements[1], row[1]))
                 if ID == row[1]:
-                    print('exist data user: {}'.format(row[:-1]))
+                    print('tje data user get to: {}'.format(row[:-1]))
                     self.mysqlDisconnect()
                     ls = list(row[:-1])
                     file_image = 'picture/image_save/{}_{}'.format(ls[1], ls[5])

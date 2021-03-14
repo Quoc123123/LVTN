@@ -305,17 +305,12 @@
 
 # from user_infor import *
 
-
 # test = UserInfor()
 
-
-# test.mysqlConnection()
-# test.insertData('quoc', '1122f1', 'bk', 'hcm', 'VN', '12_2021', 'D:/Study/Tren_lop/DeCuongLuanVan/UI/Attendance_System/picture/image_tools/icon_select.jpg')
-# test.mysqlDisconnect()
-
+ 
 # test.selectTable()
 # test.sortTable(table_columns_elements[1])
-# test.updateUser('123', 'Name', 'quocbrave')
+# test.updateUser('2244991', 'Name', 'abcd')
 # print(test.getNumberUser())
 # test.checkDataUser('123')'
 
@@ -485,9 +480,9 @@
 # Hour, Minute, Second = timeStamp.split(":")
 # fileName = "Attendance"+os.sep+"Attendance_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
 # attendance.to_csv(fileName, index=False)
-from user_infor import *
+# from user_infor import *
 
-test = UserInfor()
-# test.getNumberUser()
-test.getAllUser()
-# test.getDataUser('2244991')
+# test = UserInfor()
+# # test.getNumberUser()
+# test.getAllUser()
+# # test.getDataUser('2244991')
