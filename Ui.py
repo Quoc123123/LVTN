@@ -115,8 +115,6 @@ class UI(QMainWindow):
         # The variable contains the amount of data registerd 
         self.numUserRegister = 0
 
-
-
         # show init UI
         self.show()
         
@@ -318,9 +316,6 @@ class UI(QMainWindow):
     def registerUserData(self):
         if self.flagConnect: 
             if self.user.mysqlConnection():
-                # loading  the number of user on database
-                self.numUserRegister = self.user.getNumberUser()
-
                 # setting multi-media for the display 
                 self.lb_select.setGeometry(-10, 460, 51, 61)
                 self.groupBoxConnection.setVisible(True)
@@ -332,26 +327,10 @@ class UI(QMainWindow):
                 self.btnCloseTag.setVisible(False)
                 self.lbLoading.setVisible(False)
 
-                self.clearDisplayData()
                 self.radioSearchName.setChecked(True)
+                # self.clearDisplayData()
+                self.displayTable()
 
-                # Row count 
-                self.tableWidget.setRowCount(self.numUserRegister)  
-
-                # Column count 
-                self.tableWidget.setColumnCount(6)   
-
-                self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
-                self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
-                self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
-                self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
-                self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
-                self.tableWidget.setItem(0, 5, QTableWidgetItem("Time"))
-
-                # Table will fit the screen horizontally 
-                self.tableWidget.horizontalHeader().setStretchLastSection(True) 
-                self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
-                
             else:
                 print("error connecting to the server")
                 msg = QMessageBox() 
@@ -509,7 +488,7 @@ class UI(QMainWindow):
 
                         # Clear data for the next register
                         self.clearDisplayData()
-                        # TODO: Display the data just inserted on the table 
+                        self.displayTable()
                     else:
                         msg = QMessageBox()
                         msg.setIcon(QMessageBox.Critical)
@@ -552,10 +531,87 @@ class UI(QMainWindow):
             self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
             self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
 
-    def clearDisplayTable(self):
-        self.tableWidget.clear()
+    def displayTable(self):
+        self.updateNumberUser()
+        users = []
+        users = self.user.getAllUser()
 
+        # Creating  empty table
+        self.tableWidget.setRowCount(self.numUserRegister)  
+        self.tableWidget.setColumnCount(6)   
 
+        # self.tableWidget.setItem(0, 0, QTableWidgetItem("Name")) 
+        # self.tableWidget.setItem(0, 1, QTableWidgetItem("ID")) 
+        # self.tableWidget.setItem(0, 2, QTableWidgetItem("Address")) 
+        # self.tableWidget.setItem(0, 3, QTableWidgetItem("City")) 
+        # self.tableWidget.setItem(0, 4, QTableWidgetItem("Country"))
+        # self.tableWidget.setItem(0, 5, QTableWidgetItem("Time"))
+        
+        self.tableWidget.setHorizontalHeaderLabels(('Name', 'ID', 'Address', 'City', 'Country', 'Time'))
+
+        # Table will fit the screen horizontally 
+        self.tableWidget.horizontalHeader().setStretchLastSection(True) 
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
+        
+
+        row = 0
+        # Display elements in User
+        for user in users:
+            column = 0
+            for i in range (len(user) - 1):
+                item = QTableWidgetItem(user[i])
+
+                # make cell not editable
+                item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                self.tableWidget.setItem(row, column, item)
+                column += 1
+            row += 1     
+                 
+        # self.tableWidget.sortByColumn(0, QtCore.Qt.AscendingOrder) 
+        
+        # Adjust size of Table
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.resizeRowsToContents()
+        
+        # Add Table to Grid
+        grid = QGridLayout()
+        grid.addWidget(self.tableWidget, 0, 0)
+
+        self.tableWidget.viewport().installEventFilter(self)
+
+    def updateNumberUser(self):
+        # loading  the number of user on database
+        self.numUserRegister = self.user.getNumberUser()
+
+    def eventFilter(self, source, event):
+        if self.tableWidget.selectedIndexes() != []:
+            row = self.tableWidget.currentRow()
+            col = self.tableWidget.currentColumn()
+            if event.type() == QtCore.QEvent.MouseButtonRelease:
+                    if event.button() == QtCore.Qt.LeftButton:
+                        row = self.tableWidget.currentRow()
+                        col = self.tableWidget.currentColumn()
+                        self.tableWidget.selectRow(row)
+                        print('Left mouse:({}, {}) was pressed'.format(row, col))
+
+                        # display image the registerd user
+                        self.displayImageRegister(row)
+                    elif event.button() == QtCore.Qt.RightButton:
+
+                        row = self.tableWidget.currentRow()
+                        col = self.tableWidget.currentColumn()
+                        print('Right mouse: ({}, {}) was pressed'.format(row, col))
+            
+        return QtCore.QObject.event(source, event)
+
+    def displayImageRegister(self, row):
+        id = self.tableWidget.item(row, 1).text()
+        dateRegister = self.tableWidget.item(row, 5).text()
+        print('id: {}, date: {} has been taken from table'.format(id, dateRegister))
+        self.lbViewRegister.setScaledContents(True)
+        self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.png'.format(id, dateRegister)))
+
+    
 # =================================================================================================================
 # Run the UI
 # =================================================================================================================

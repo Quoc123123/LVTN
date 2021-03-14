@@ -385,8 +385,50 @@ class UserInfor:
                 self.myCursor.close()
                 self.myDatabase.close()
                 print('MySQL connection is closed')
+    
+    def getAllUser(self):
+        users = []
+        try: 
+            self.myDatabase = mysql.connector.connect(**dictConnect)
+            print(self.myDatabase)
+            self.myCursor = self.myDatabase.cursor()
+            print('Connecting successfully')
+            
+            query = 'SELECT * FROM {}'.format(TABLE_NAME)
+            self.myCursor.execute(query)
+            record = self.myCursor.fetchall()
+            for row in record: 
+                ls = list(row[:-1])
+                file_image = 'picture/image_save/{}_{}'.format(ls[1], ls[5])
+                self.writeFile(row[6], file_image)
+                ls.append(file_image)
+                tp = tuple(ls)
+                users.append(tp)
+            print('All of user: ', users)
+            return users
+                                
+                    
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print('Error: Something is wrong with your user name or password')
+                return mysql_query_status['CONNECTION_ERROR']
+
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print('Error: Database does not exist')
+                return mysql_query_status['CONNECTION_ERROR']
+            elif err.errno == errorcode.ER_DUP_ENTRY:
+                print('Error: Database was duplicated')
+                return mysql_query_status['CONNECTION_ERROR']
+            else:
+                print('Error: Failed to ascending the data from MYSQL table {}').format(err)
+                return mysql_query_status['CONNECTION_ERROR']
+        finally:
+           if self.myDatabase.is_connected():
+                self.myCursor.close()
+                self.myDatabase.close()
+                print('MySQL connection is closed')          
         
-        
+
     def getDataUser(self, ID):
         try: 
             self.myDatabase = mysql.connector.connect(**dictConnect)
@@ -409,7 +451,6 @@ class UserInfor:
                     print(ls)
                     return ls
                     
-                
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print('Error: Something is wrong with your user name or password')

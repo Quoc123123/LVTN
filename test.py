@@ -488,4 +488,6 @@
 from user_infor import *
 
 test = UserInfor()
-test.getNumberUser()
+# test.getNumberUser()
+test.getAllUser()
+# test.getDataUser('2244991')
