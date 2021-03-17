@@ -486,3 +486,17 @@
 # # test.getNumberUser()
 # test.getAllUser()
 # # test.getDataUser('2244991')
+
+
+# import datetime
+ 
+# today = datetime.datetime.today()
+# print(f"{today:%B %d, %Y}")
+
+
+from smart_util import *
+
+# csv_data_logging('quopc', '1232', 'bentre', 'hcm', 'vn')
+sendEmailToAdmin()
+
+

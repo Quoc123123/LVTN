@@ -5,7 +5,6 @@ import os
 import time
 
 
-
 SAMPLE_NUMBER = 30
 
 

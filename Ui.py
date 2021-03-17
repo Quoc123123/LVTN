@@ -248,6 +248,9 @@ class UI(QMainWindow):
             self.lbViewUser.setScaledContents(True)
             self.lbViewUser.setPixmap(QPixmap(ls[6]))
 
+            # logging data to  attendace list (using face recognition)
+            csv_data_logging(ls[0], ls[1], ls[2], ls[3], [4])
+
         else:
             # Display the message user doesn't register yet
             msg = QMessageBox() 
@@ -292,6 +295,10 @@ class UI(QMainWindow):
                     self.lbDisplayCountry.setText(ls[4])
                     self.lbViewUser.setScaledContents(True)
                     self.lbViewUser.setPixmap(QPixmap(ls[6]))
+                    
+                    # logging data to  attendace list (using id card)
+                    csv_data_logging(ls[0], ls[1], ls[2], ls[3], [4])
+
                 else:
                     # Display the message user doesn't register yet
                     msg = QMessageBox() 

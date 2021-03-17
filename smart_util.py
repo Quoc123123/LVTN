@@ -6,7 +6,9 @@ import time
 import pyttsx3
 import sqlite3
 import mysql.connector
+import yagmail
 
+path = 'Attendance'
 
 
 #===============================================================================
@@ -67,3 +69,62 @@ def title_bar():
     print("\t**********************************************")
     print("\t***** Face And Tags Recognition Attendance System *****")
     print("\t**********************************************")
+
+
+#===============================================================================
+# logging data to csv file
+#===============================================================================
+def csv_data_logging(name, id, address, city, country):
+    ts = time.time()
+    date_attendance = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+    time_attendance = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+
+
+    file_name = 'Attendance' + os.sep + 'Attendance_' + date_attendance + '.csv'
+    file_exists = os.path.isfile(file_name)
+
+    fieldnames = ['Name', 'ID', 'Address', 'City', 'Country', 'Date', 'Time']
+
+
+    with open(file_name, 'a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        if not file_exists:
+            writer.writeheader()
+            print('File test report {} has been created !!!'.format(file_name))
+        writer.writerow({'Name': name, 'ID': id, 'Address': address, 
+                    'City': city, 'Country': country, 'Date': date_attendance, 'Time': time_attendance})
+        print('User has been added to the attendance list ')
+                        
+    
+#===============================================================================
+# Send email address to admin
+#===============================================================================
+def sendEmailToAdmin():
+    date = datetime.date.today().strftime("%B %d, %Y")
+
+    # receiver email address
+    receiver = 'quoc.bui1999@hcmut.edu.vn'
+
+    # Change the current working directory to the specified path.
+    os.chdir(path)
+    files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+    print(files)
+    if len(files) == 0:
+        print('Not exitst file in the attendance folder')
+        return
+
+    newest = files[-1]
+    filename = newest
+    sub = "Attendance Report for " + str(date)
+
+    # mail information
+    yag = yagmail.SMTP("quocquocbui1999@gmail.com", "buivanquoc")
+
+    # sent the mail
+    yag.send(
+        to = receiver,
+        subject = sub, # email subject
+        contents = 'Attendance File',  # email body
+        attachments = filename  # file attached
+    )
+    print('{} file sent to admin!'.format(filename))
