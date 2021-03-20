@@ -494,9 +494,17 @@
 # print(f"{today:%B %d, %Y}")
 
 
-from smart_util import *
+# from smart_util import *
 
-# csv_data_logging('quopc', '1232', 'bentre', 'hcm', 'vn')
-sendEmailToAdmin()
+# # csv_data_logging('quopc', '1232', 'bentre', 'hcm', 'vn')
+# sendEmailToAdmin()
+
+
+from face_attendance import *
+
+
+abc = RecognitionUser()
+# abc.getDataSet('123')
+abc.facial_landmarks()
 
 
