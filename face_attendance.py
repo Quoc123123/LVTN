@@ -10,23 +10,8 @@ import dlib
 from imutils import face_utils, rotate_bound
 
 
-SAMPLE_NUMBER = 30
-BLUE = (255,0,0)
-GREEN = (0,255,0)
-RED = (0,0,255)
-YELL = (0,255,255)
-
-
-
 # Path for face image database
 path = 'dataset'
-
-# Filters path
-haar_faces = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
-haar_eyes = cv2.CascadeClassifier('Data/haarcascade_eye.xml')
-haar_mouth = cv2.CascadeClassifier('Data/Mouth.xml')
-haar_nose = cv2.CascadeClassifier('Data/Nose.xml')
-
 
 model = "Data/filters/shape_predictor_68_face_landmarks.dat"
 
@@ -36,91 +21,6 @@ model = "Data/filters/shape_predictor_68_face_landmarks.dat"
 class RecognitionUser():
     def __init__(self):
         pass
-
-    def apply_haar_filter(self, img, haar_cascade, scaleFact = 1.1, minNeigh = 5, minSizeW = 30):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        features = haar_cascade.detectMultiScale(
-            gray,
-            scaleFactor=scaleFact,
-            minNeighbors=minNeigh,
-            minSize=(minSizeW, minSizeW),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-        return features
-
-    def getDataSet(self, face_id):
-        imagepath = ''
-
-        # For each person, enter one numeric face id
-        print('Initializing face captures. Look the camera and wait ...')
-        
-        # Initialize individual sampling face count
-        count = 0
-        
-        # Config webcam
-        cap = cv2.VideoCapture(0)
-        cv2.imshow('Video', np.empty((5,5),dtype=float))
-
-        while(True):
-            # Capture frame-by-frame
-            ret, img = cap.read()
-            img = cv2.flip(img, 1) # Flip camera vertically
-            
-            # Take a image for display purpose
-            if(count == SAMPLE_NUMBER / 2):
-                imagepath = 'picture/image_user/User.' + face_id  + '.jpg'
-                print('[INFO] The image user register', imagepath)
-                cv2.imwrite(imagepath, img)
-
-            # draw a frame in the middle of the screen so that the user 
-            # can bring his face into this area
-            # centerH = img.shape[0] // 2 
-            # centerW = img.shape[1] // 2
-            # sizeboxW = 300
-            # sizeboxH = 400
-            # cv2.rectangle(img, (centerW - sizeboxW // 2, centerH - sizeboxH // 2),
-            #             (centerW + sizeboxW // 2, centerH + sizeboxH // 2), (255, 255, 255), 5)
-
-            # classifier function
-            faces = self.apply_haar_filter(img, haar_faces, 1.3, 5, 30)
-
-            for(x, y, w, h) in faces:
-                cv2.rectangle(img, (x, y), (x+w, w+h), BLUE, 2)
-
-                sub_img = img[y:y+h,x:x+w,:]
-                eyes = self.apply_haar_filter(sub_img, haar_eyes, 1.3 , 10, 10)
-                for (x2, y2, w2, h2) in eyes:
-                    cv2.rectangle(img, (x+x2, y+y2), (x + x2+w2, y + y2+h2), YELL, 2)
-
-                nose = self.apply_haar_filter(sub_img, haar_nose, 1.3 , 8, 10)
-                for (x2, y2, w2, h2) in nose:
-                    cv2.rectangle(img, (x+x2, y+y2), (x + x2+w2, y + y2+h2), RED, 2) #red
-                
-                # only analize half of face for mouth
-                sub_img2 = img[y + h//2:y+h,x:x+w,:] 
-                mouth = self.apply_haar_filter(sub_img2, haar_mouth, 1.3 , 10, 10)
-                for (x2, y2, w2, h2) in mouth:
-                    cv2.rectangle(img, (x+x2, y+h//2+y2), (x + x2+w2, y+h//2+y2+h2), GREEN, 2) #green
-
-
-                count += 1
-                cv2.imwrite('dataset/User.' + face_id + '.' + str(count) + '.jpg', cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)[y:y+h, x:x+w])
-
-            cv2.imshow('Video', img)
-            
-            k = cv2.waitKey(100) & 0xff
-            if k == 27: # press 'ESC' to quit
-                break
-            elif count >= SAMPLE_NUMBER: # take 30 face sample and stop video
-                break
-        # Do a bit cleanup
-        print('[INFO] Exiting Program and cleanup stuff')
-
-        cap.release()
-        cv2.destroyAllWindows()
-        return imagepath
-
 
     # points are tuples in the form (x,y)
     # returns angle between points in degrees
@@ -223,109 +123,6 @@ class RecognitionUser():
     	        break
         video_capture.release()
         cv2.destroyAllWindows()
-
-    # def trainingUser(self):
-    #     print('[INFO] Traning faces. It will take a few seconds. Wait ...')
-    #     # 
-    #     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    #     faces, ids = self.getImagesAndLabels(path)
-    #     recognizer.train(faces, np.array(ids))
-
-    #     # Save the model into trainer/trainer.yml
-    #     recognizer.write('trainer/trainer.yml') 
-
-    #     # print the number of faces trained and end program
-    #     print('[INFO] {0} faces trained. Exiting Program'.format(len(np.unique(ids))))
-
-
-    # def getImagesAndLabels(self, path):
-    #     imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
-    #     faceSamples = []
-    #     ids = []
-    #     for imagePath in imagePaths:
-    #         PIL_img = Image.open(imagePath).convert('L') # convert it to grayscale
-    #         img_numpy = np.array(PIL_img, 'uint8')
-    #         id = int(os.path.split(imagePath)[-1].split('.')[1])
-    #         print('ID: ', id)
-    #         faces = detector.detectMultiScale(img_numpy)
-    #         for(x, y, w, h) in faces:
-    #             faceSamples.append(img_numpy[y:y+h, x:x+w])
-    #             ids.append(id)
-    #     return faceSamples, ids 
-
-    # def recognitionUser(self, timeout):
-    #     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    #     recognizer.read('trainer/trainer.yml')
-
-    #     # initiate id counter
-    #     id = 0
-    #     confidence = 0
-
-
-    #     # Initialize and start realine video capture
-    #     cam = cv2.VideoCapture(0)
-    #     cam.set(3, 640) # set video widht
-    #     cam.set(4, 480) # set video height
-
-    #     # Define min window size to be recognized as a face
-    #     minW = 0.1*cam.get(3)
-    #     minH = 0.1*cam.get(4)
-
-    #     start_time = time.time()
-
-    #     while True:
-    #         # read image from camera
-    #         ret, img = cam.read()
-    #         img =  cv2.flip(img, 1)
-
-    #         centerH = img.shape[0] // 2
-    #         centerW = img.shape[1] // 2
-    #         sizeboxW = 300
-    #         sizeboxH = 400
-    #         cv2.rectangle(img, (centerW - sizeboxW // 2, centerH - sizeboxH // 2),
-    #                     (centerW + sizeboxW // 2, centerH + sizeboxH // 2), (255, 255, 255), 5)
-
-    #         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #         faceCascade = cv2.CascadeClassifier(cascadePath)
-    #         faces = faceCascade.detectMultiScale(gray, scaleFactor = 1.2, minNeighbors = 5,  minSize = (int(minW), int(minH)))
-
-    #         for(x, y, w, h) in faces:
-    #             cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-    #             id, confidence = recognizer.predict(gray[y:y+h, x:x+w])
-    #             print('Face recognition id: {} - Confidence: {}'.format(id, confidence))
-
-    #             # Check if confidence is less them 100 ==> '0' is perfect match
-    #             if(confidence < 100):
-    #                 # confidence = '{0}%'.format(round(100 - confidence))
-    #                 confidence = round(100 - confidence)
-    #                 cv2.putText(img, str(id), (x, y+h+30), font, 1, (0, 255, 0), 2)
-    #             else:
-    #                 # confidence = '{0}%'.format(round(100 - confidence))
-    #                 confidence = round(100 - confidence)
-    #                 cv2.putText(img, 'Name: Unknown', (x, y+h+30), font, 1, (255, 0, 0), 2)
-    #                 print('Name: Unknown')
-
-    #         # Check the timeout
-    #         if time.time() - start_time > timeout:
-    #             print("[INFO] Exiting Program and cleanup stuff")
-                
-    #             # Do a bit of cleanup
-    #             cam.release()
-    #             cv2.destroyAllWindows()
-    #             return str(id), str(confidence)
-    #             break
-            
-
-    #         cv2.imshow('camera', img)
-    #         cv2.waitKey(10)
-            # print("[INFO] Exiting Program and cleanup stuff")
-            # # Do a bit of cleanup
-            # cam.release()
-            # cv2.destroyAllWindows()
-          
-            # k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
-            # if k == 27:
-            #     break
 
 class FaceAligner():
     def __init__(self, predictor, desiredLeftEye=(0.35, 0.35), desiredFaceWidth=256, desiredFaceHeight=None):
