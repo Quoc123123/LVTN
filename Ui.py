@@ -31,7 +31,7 @@ class UI(QMainWindow):
         # Load and setting the default when opening the GUI
         # *********************************************************
         loadUi('design_ui/Ui.ui', self)
-        self.setWindowTitle('QuocBrave')
+        self.setWindowTitle('Attendance System')
 
         # *********************************************************
         # Creating class elements for UI

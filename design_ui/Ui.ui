@@ -1193,17 +1193,6 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuDelete">
-    <property name="title">
-     <string>ContextMenuStrip</string>
-    </property>
-    <addaction name="separator"/>
-    <addaction name="actionDelete"/>
-    <addaction name="actionSelect_All"/>
-    <addaction name="actionClear_Selection"/>
-    <addaction name="actionRefresh"/>
-   </widget>
-   <addaction name="menuDelete"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionDelete">
