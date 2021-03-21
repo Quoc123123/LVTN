@@ -8,20 +8,25 @@ import datetime
 import imutils
 import dlib
 from imutils import face_utils, rotate_bound
+import face_recognition_models
+import face_recognition
+from face_recognition.face_recognition_cli import image_files_in_folder
+
+
 
 
 # Path for face image database
-path = 'dataset'
+path = 'recognition/dataset'
+output = 'recognition/dataset'
 
-model = "Data/filters/shape_predictor_68_face_landmarks.dat"
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# detector = cv2.CascadeClassifier('Data/haarcascade_frontalface_default.xml')
-# font = cv2.FONT_HERSHEY_SIMPLEX
+
 
 class RecognitionUser():
     def __init__(self):
         pass
-
+    
     # points are tuples in the form (x,y)
     # returns angle between points in degrees
     def calculate_inclination(self, point1, point2):
@@ -53,16 +58,18 @@ class RecognitionUser():
             (x,y,w,h) = self.calculate_boundbox(points[48:68]) #mouth
         return (x,y,w,h)
 
-    def facial_landmarks(self):
+    def facial_landmarks(self, ID):
         # initialize dlib's face detector (HOG-based + Linear SVM face) and then create
         # the facial landmark predictor
         print("[INFO] loading facial landmark predictor...")
         detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor(model)
-        fa = FaceAligner(predictor, desiredFaceWidth=256)
+        predictor = dlib.shape_predictor(face_recognition_models.pose_predictor_model_location())
 
         video_capture = cv2.VideoCapture(0)
         cv2.imshow('Video', np.empty((5,5),dtype=float))
+        
+        # total number of faces written to disk
+        total = 0
 
 
         # loop over the frames from the video stream
@@ -73,6 +80,7 @@ class RecognitionUser():
             
             # Capture frame-by-frame
             ret, frame = video_capture.read()
+            orig = frame.copy()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             # detect faces in the grayscale frame
@@ -99,31 +107,70 @@ class RecognitionUser():
 
                 # x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
                 (x, y, w, h) = face_utils.rect_to_bb(rect)
-
-                faceOrig = imutils.resize(frame[y:y + h, x:x + w], width=256)
-                faceAligned = fa.align(frame, gray, rect)
-
-                # # display the output images
-                cv2.imshow("Original", frame[y:y + h, x:x + w])
-                cv2.imshow("Aligned", faceAligned)
-
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
-
 
                 # loop over the (x, y)-coordinates for the facial landmarks
                 # and draw them on the image
                 for (x, y) in shape:
                     cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
-                    
-
             cv2.imshow("Frame", frame)
+
+            time.sleep(0.2)
+            p = os.path.join(output, ID)
+            if not os.path.exists(p):
+                os.makedirs(p)
+            p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
+            total += 1
+            cv2.imwrite(p, orig)
+
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
             if key == ord("q"):
     	        break
+        print("[INFO] {} face images stored".format(total))
+        print("[INFO] cleaning up...")
         video_capture.release()
         cv2.destroyAllWindows()
 
+
+    def train(self, train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree', verbose=False):
+        """
+        Trains a k-nearest neighbors classifier for face recognition.
+
+        :param train_dir: directory that contains a sub-directory for each known person, with its name.
+
+        (View in source code to see train_dir example tree structure)
+
+        Structure:
+            <train_dir>/
+            ├── <person1>/
+            │   ├── <somename1>.jpeg
+            │   ├── <somename2>.jpeg
+            │   ├── ...
+            ├── <person2>/
+            │   ├── <somename1>.jpeg
+            │   └── <somename2>.jpeg
+            └── ...
+
+        :param model_save_path: (optional) path to save model on disk
+        :param n_neighbors: (optional) number of neighbors to weigh in classification. Chosen automatically if not specified
+        :param knn_algo: (optional) underlying data structure to support knn.default is ball_tree
+        :param verbose: verbosity of training
+        :return: returns knn classifier that was trained on the given data.
+        """
+
+        X = []
+        y = []
+
+        # Loop through each person in the training set
+        for class_dir in os.listdir(train_dir):
+            if not os.path.isdir(os.path.join(train_dir, class_dir)):
+                continue
+            
+            # Loop through each training image for the current person
+            for img_path in image_files_in_folder(os.path.join(train_dir, class_dir)):
+                image = face_recognition.load_image_file(img_path)
+        
 class FaceAligner():
     def __init__(self, predictor, desiredLeftEye=(0.35, 0.35), desiredFaceWidth=256, desiredFaceHeight=None):
         # Store the facial landmark predictor, desired output left

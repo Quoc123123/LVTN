@@ -505,6 +505,6 @@ from face_attendance import *
 
 abc = RecognitionUser()
 # abc.getDataSet('123')
-abc.facial_landmarks()
+abc.facial_landmarks('123')
 
 
