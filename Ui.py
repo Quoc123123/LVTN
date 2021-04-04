@@ -8,7 +8,7 @@ from PyQt5.uic import loadUi
 from smart_util import *
 from serial_attendance import *
 from user_infor import *
-from face_attendance import *
+from face_recogniton_knn import *
 
 
 listPort = []
@@ -17,6 +17,8 @@ listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 PATH_IMAGE_USER = 'picture/image_user/'
 PATH_IMAGE_TOOLS = 'picture/image_tools/'
 PATH_IMAGE_SAVE = 'picture/image_save/'
+
+DATASET_TRAINING_PATH = 'recognition/dataset/'
 
 
 
@@ -183,6 +185,7 @@ class UI(QMainWindow):
                 self.lbConnectImage.setScaledContents(True)
                 self.flagConnect = False
                 print('Closed serial port')
+
         except Exception as exc:
             print('Error creating serialDevice')
             msg = QMessageBox() 
@@ -237,7 +240,7 @@ class UI(QMainWindow):
             self.usingFaceRecogniton()
     
     def usingFaceRecogniton(self):
-        id, confidence = self.faceRecognition.recognitionUser(5)
+        id = self.faceRecognition.recognitionUser()
         if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
             ls = self.user.getDataUser(id)
             self.lbDisplayName.setText(ls[0])
@@ -280,7 +283,7 @@ class UI(QMainWindow):
             if checkData > 0:
                 # Processing receive data
                 self.dataDisplay = ''
-                for i in range(len(receiveData) - 2):
+                for i in range(len(receiveData)):
                     self.dataDisplay += '{0:x}'.format(receiveData[i])
                 self.dataDisplay = str(int(self.dataDisplay, 16))
                 self.lbIDUserData.setText('ID: ' + self.dataDisplay)
@@ -343,7 +346,7 @@ class UI(QMainWindow):
                 print("error connecting to the server")
                 msg = QMessageBox() 
                 msg.setWindowTitle("information")
-                msg.setText("Error conneting to the server, plesse check the newwork connection!!")
+                msg.setText("Error conneting to the server, plesse check the network connection!!")
                 msg.setIcon(QMessageBox.Information)
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
@@ -387,7 +390,7 @@ class UI(QMainWindow):
             if checkData > 0:
                 # Processing receive data
                 self.dataDisplay = ''
-                for i in range(len(receiveData) - 2):
+                for i in range(len(receiveData)):
                     self.dataDisplay += '{0:x}'.format(receiveData[i])
 
                 self.dataDisplay = str(int(self.dataDisplay, 16))
@@ -463,30 +466,20 @@ class UI(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
-        else:
-            # User doest't register yet
-            if len(self.name) == 0 and len(self.address) == 0 \
-                and len(self.city) == 0 and len(self.country) == 0:
-                print("Not eligible for registration because the textbox yet fill out")
-                msg = QMessageBox() 
-                msg.setWindowTitle("Information")
-                msg.setText("Please fill in the textbox completely!!!")
-                msg.setIcon(QMessageBox.Information)
-                msg.setStandardButtons(QMessageBox.Ok)
-                msg.setDefaultButton(QMessageBox.Ok)
-                x = msg.exec_() # execute the message
+        
+        elif len(self.name) == 0 or len(self.address) == 0 \
+            or len(self.city) == 0 or len(self.country) == 0:
+            print("Not eligible for registration because the textbox yet fill out")
+            msg = QMessageBox() 
+            msg.setWindowTitle("Information")
+            msg.setText("Please fill in the textbox completely!!!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setDefaultButton(QMessageBox.Ok)
+            x = msg.exec_() # execute the message
 
-            elif self.idUser == 'ID    _________':
-                print("Not eligible for registration because the id user yet scan") 
-                msg = QMessageBox() 
-                msg.setWindowTitle("Information")
-                msg.setText("Please click the scan button to have the code tags!!!")
-                msg.setIcon(QMessageBox.Information)
-                msg.setStandardButtons(QMessageBox.Ok)
-                msg.setDefaultButton(QMessageBox.Ok)
-                x = msg.exec_() # execute the message
-    
-            elif len(self.imagePath) == 0:
+        else:
+            if len(self.imagePath) == 0:
                 print("Not eligible for registration because the browse choose the image yet ") 
                 msg = QMessageBox() 
                 msg.setWindowTitle("Information")
@@ -495,7 +488,6 @@ class UI(QMainWindow):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
                 x = msg.exec_() # execute the message
-                
             else:
                 if not self.flagUpdate:
                     # User does't register yet
@@ -552,12 +544,12 @@ class UI(QMainWindow):
         self.imagePath = ''
 
     def browseImageUserAndTrain(self):
-        # TODO: add image into button intead of get image from camera
-        # # Choose the image file for the user data
-        # filename = QFileDialog.getOpenFileName()
-        # self.imagePath = filename[0]
-        # print(self.imagePath)
-        # # self.imagePath = os.path.split(imagePath)[-1]
+
+        # Choose the image file for the user data
+        filename = QFileDialog.getOpenFileName()
+        self.imagePath = filename[0]
+        print('image path'.format(self.imagePath))
+        # self.imagePath = os.path.split(imagePath)[-1]
 
         if self.lbID.text() == 'ID    _________':
             print("Not eligible for registration because the id user yet scan") 
@@ -568,13 +560,32 @@ class UI(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
+
+        elif len(self.textName.toPlainText()) == 0 or len(self.textAddress.toPlainText()) == 0 \
+            or len(self.textCity.toPlainText()) == 0 or len(self.textCountry.toPlainText()) == 0:
+            print("Not eligible for registration because the textbox yet fill out")
+            msg = QMessageBox() 
+            msg.setWindowTitle("Information")
+            msg.setText("Please fill in the textbox completely!!!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setDefaultButton(QMessageBox.Ok)
+            x = msg.exec_() # execute the message
         else:
-            self.imagePath = self.faceRecognition.getDataSet(self.idUser)
+            # get data user into the file (include image, name, id, ....)
+            self.faceRecognition.facial_landmarks(self.idUser)
             self.faceRecognition.trainingUser()
 
             # display the image to button
             self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
             self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
+
+            msg = QMessageBox() 
+            msg.setWindowTitle("Information")
+            msg.setText("Get imgae uset successfully!!!")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setDefaultButton(QMessageBox.Ok)
 
     def displayTable(self):
         self.updateNumberUser()

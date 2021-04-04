@@ -3,13 +3,9 @@
 
 # ser = SerialComm()
 # ser.connectSerial("COM11", 19200)
-
-# while True:
-#     a = ser.check_data_from_device()
-#     if a > 0:
-#         print(a)
-#         b = ser.get_data_from_device()
-#         print(b)
+# while 1:
+#     a, data = ser.get_data_from_device()
+#     print(data)
    
 
 
@@ -506,6 +502,9 @@ from face_recogniton_knn import *
 abc = RecognitionUser()
 # abc.getDataSet('123')
 # abc.facial_landmarks('123')
-abc.trainingUser()
+# abc.trainingUser()
+abc.recognitionUser()
+
+
 
 

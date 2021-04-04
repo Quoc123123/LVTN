@@ -5,28 +5,28 @@ import pickle
 from PIL import Image, ImageDraw
 import os
 import time
-from imutils import face_utils
+from imutils import face_utils,  rotate_bound
 import datetime
 import imutils
 import dlib
-from imutils import face_utils, rotate_bound
 import face_recognition_models 
 import recognition.face_recognition as face_recognition
 from recognition.face_recognition.face_recognition_cli import image_files_in_folder
-
+from user_infor import *
 
 
 # Path for face image database
-input_training_dir = 'recognition/dataset'
-output_training = 'recognition/output/trained_knn_model.clf'
+INPUT_TRAINING_DIR = 'recognition/dataset/train'
+INPUT_TEST_DIR = 'recognition/dataset/test'
+OUTPUT_TRAINING_DIR = 'recognition/output/trained_knn_model.clf'
+
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 class RecognitionUser():
     def __init__(self):
-        pass
-    
+        self.userInfor = UserInfor()
     # points are tuples in the form (x,y)
     # returns angle between points in degrees
     def calculate_inclination(self, point1, point2):
@@ -116,13 +116,15 @@ class RecognitionUser():
             cv2.imshow("Frame", frame)
 
             time.sleep(0.2)
-            p = os.path.join(output, ID)
+            p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
             if not os.path.exists(p):
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
             total += 1
             cv2.imwrite(p, orig)
 
+            if total >= 10:
+                break
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop
             if key == ord("q"):
@@ -270,31 +272,77 @@ class RecognitionUser():
 
         # Display the resulting image
         pil_image.show()
+        
 
     def trainingUser(self):
         # STEP 1: Train the KNN classifier and save it to disk
         # Once the model is trained and saved, you can skip this step next time.
         print("Training KNN classifier...")
-        classifier = self.train('recognition/knn_examples/train', model_save_path=output_training, n_neighbors=2)
+        classifier = self.train(f'{INPUT_TRAINING_DIR}', model_save_path=OUTPUT_TRAINING_DIR, n_neighbors=2)
         print("Training complete!")
 
-        # STEP 2: Using the trained classifier, make predictions for unknown images
-        for image_file in os.listdir('recognition/knn_examples/test'):
-            full_file_path = os.path.join("recognition/knn_examples/test", image_file)
+    def recognitionUser(self):
+        # Initialize and start realine video capture
+        video_capture = cv2.VideoCapture(0)
+        cv2.imshow('Video', np.empty((5,5),dtype=float))
+        
+        # loop over the frames from the video stream
+        # while cv2.getWindowProperty('Video', 0) >= 0:
+        check_number = 0
+        while cv2.getWindowProperty('Video', 0) >= 0:
+            # Capture frame-by-frame
+            ret, frame = video_capture.read()
+            orig = frame.copy()
+            
+            # writing image
+            p = os.path.join(INPUT_TEST_DIR, "{}.png".format('user1'))
+            cv2.imwrite(p, orig)
 
-            print("Looking for faces in {}".format(image_file))
+            # using the trained classifier, make predictions for unknown images
+            for image_file in os.listdir(INPUT_TEST_DIR):
+                full_file_path = os.path.join(INPUT_TEST_DIR, image_file)
 
-            # Find all people in the image using a trained classifier model
-            # Note: You can pass in either a classifier file name or a classifier model instance
-            predictions = self.predict(full_file_path, model_path=output_training)
+                print("Looking for faces in {}".format(image_file))
 
-            # Print results on the console
-            for name, (top, right, bottom, left) in predictions:
-                print("- Found {} at ({}, {})".format(name, left, top))
+                # Find all people in the image using a trained classifier model
+                # Note: You can pass in either a classifier file name or a classifier model instance
+                predictions = self.predict(full_file_path, model_path=OUTPUT_TRAINING_DIR)
 
-            # Display results overlaid on an image
-            self.show_prediction_labels_on_image(os.path.join("recognition/knn_examples/test", image_file), predictions)
+                    
+                # Display results overlaid on an image
+                pil_image = Image.open(full_file_path).convert("RGB")
+                draw = ImageDraw.Draw(pil_image)
 
+                for name, (top, right, bottom, left) in predictions:
+                    print("- Found {} at ({}, {})".format(name, left, top))
+                    # Draw a box around the face using the Pillow module
+                    cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 1)
+
+                    # Draw a label with a name below the face
+                    text_width, text_height = draw.textsize(name)
+                
+                    cv2.rectangle(frame, (left, bottom - text_height - 10), (right, bottom), (255, 0, 0), -1)
+                    infor = self.userInfor.getDataUser(str(name))
+                    print('User recognized: ', infor)
+                    cv2.putText(frame, infor[0], (left + 6, bottom - text_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    # Show infor user
+                    cv2.imshow('Video', frame)
+
+                    check_number += 1
+                    print(check_number)
+                    if check_number >= 3:
+                        video_capture.release()
+                        cv2.destroyAllWindows()
+                        return infor[1]
+                    
+
+            key = cv2.waitKey(1) & 0xFF
+            # if the `q` key was pressed, break from the loop
+            if key == ord("q"):
+    	        break
+
+        video_capture.release()
+        cv2.destroyAllWindows()
 
 class FaceAligner():
     def __init__(self, predictor, desiredLeftEye=(0.35, 0.35), desiredFaceWidth=256, desiredFaceHeight=None):

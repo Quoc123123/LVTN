@@ -441,7 +441,7 @@ class UserInfor:
             for row in record: 
                 # print('{} = {}'.format(table_columns_elements[1], row[1]))
                 if ID == row[1]:
-                    print('tje data user get to: {}'.format(row[:-1]))
+                    print('the data user get to: {}'.format(row[:-1]))
                     self.mysqlDisconnect()
                     ls = list(row[:-1])
                     file_image = 'picture/image_save/{}_{}'.format(ls[1], ls[5])
@@ -472,7 +472,7 @@ class UserInfor:
 
     def writeFile(self, data, filename):
         # Convert binary data to proper format and write it on Hard Disk
-        with open('{}.jpg'.format(filename), 'wb') as file:
+        with open('{}.png'.format(filename), 'wb') as file:
             file.write(data)
         file.close()
 
