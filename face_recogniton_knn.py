@@ -14,9 +14,8 @@ import recognition.face_recognition as face_recognition
 from recognition.face_recognition.face_recognition_cli import image_files_in_folder
 from user_infor import *
 
-
 # Path for face image database
-INPUT_TRAINING_DIR = 'recognition/dataset/train'
+INPUT_TRAINING_DIR = 'recognition/knn_examples/train'
 INPUT_TEST_DIR = 'recognition/dataset/test'
 OUTPUT_TRAINING_DIR = 'recognition/output/trained_knn_model.clf'
 
@@ -307,7 +306,7 @@ class RecognitionUser():
             for image_file in os.listdir(INPUT_TEST_DIR):
                 full_file_path = os.path.join(INPUT_TEST_DIR, image_file)
 
-                print("Looking for faces in {}".format(image_file))
+                # print("Looking for faces in {}".format(image_file))
 
                 # Find all people in the image using a trained classifier model
                 # Note: You can pass in either a classifier file name or a classifier model instance
@@ -317,8 +316,9 @@ class RecognitionUser():
                     video_capture.release()
                     cv2.destroyAllWindows()
                     return list((None, 0, None))
-                print('predictions', predictions)
+                # print('predictions', predictions)
 
+                # TODO: Validate return value
                 # check how many faces were recognized at this time     
                 if len(predictions) > 1:
                     print('Number of faces were recognized: ', len(predictions))
@@ -331,14 +331,14 @@ class RecognitionUser():
                 draw = ImageDraw.Draw(pil_image)
 
                 for name, (top, right, bottom, left) in predictions:
-                    print("- Found {} at ({}, {})".format(name, left, top))
+                    # print("- Found {} at ({}, {})".format(name, left, top))
                     if flag_check_unknow:
                         if name == 'unknow':
                             check_number_unknow += 1
                         else:
                             flag_check_unknow == False
                         
-                    if flag_check_unknow and check_number_unknow >= 5:
+                    if flag_check_unknow and check_number_unknow >= 1:
                         print('Unknow user')
                         video_capture.release()
                         cv2.destroyAllWindows()
@@ -356,12 +356,10 @@ class RecognitionUser():
                     cv2.putText(frame, str(name), (left + 6, bottom - text_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     # Show infor user
                     cv2.imshow('Video', frame)
-
-                    if name != 'unknow':
-                        check_number_user += 1
-                        
+                    
+                    check_number_user += 1
+                    print('recognized user: {} - {}'.format(str(name), check_number_user))
                     if check_number_user >= 5:
-                        print('recognized user:', str(name))
                         video_capture.release()
                         cv2.destroyAllWindows()
                         return list((True, 1, str(name)))

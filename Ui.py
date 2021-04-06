@@ -21,6 +21,17 @@ PATH_IMAGE_SAVE = 'picture/image_save/'
 DATASET_TRAINING_PATH = 'recognition/dataset/'
 
 
+infor_user = {
+    'Name'              : 0,
+    'ID'                : 1,
+    'Address'           : 2,
+    'City'              : 3,
+    'Country'           : 4,
+    'Time'              : 5,
+    'Images'            : 6,
+}
+
+
 
 # ******************************************************************************************************************
 # PageOne of UI  
@@ -240,19 +251,23 @@ class UI(QMainWindow):
             self.usingFaceRecogniton()
     
     def usingFaceRecogniton(self):
-        id = self.faceRecognition.recognitionUser()
+        ret = self.faceRecognition.recognitionUser()
+        if not ret[0]:
+            #TODO: Display on ui which was failed
+            return 
+        id = ret[2]
         if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
             ls = self.user.getDataUser(id)
-            self.lbDisplayName.setText(ls[0])
-            self.lbIDUserData.setText('ID: ' + ls[1])
-            self.lbDisplayAddress.setText(ls[2])
-            self.lbDisplayCity.setText(ls[3])
-            self.lbDisplayCountry.setText(ls[4])
+            self.lbDisplayName.setText(ls[infor_user['Name']])
+            self.lbIDUserData.setText('ID: ' + ls[infor_user['ID']])
+            self.lbDisplayAddress.setText(ls[infor_user['Address']])
+            self.lbDisplayCity.setText(ls[infor_user['City']])
+            self.lbDisplayCountry.setText(ls[infor_user['Country']])
             self.lbViewUser.setScaledContents(True)
-            self.lbViewUser.setPixmap(QPixmap(ls[6]))
+            self.lbViewUser.setPixmap(QPixmap(ls[infor_user['Images']]))
 
             # logging data to  attendace list (using face recognition)
-            csv_data_logging(ls[0], ls[1], ls[2], ls[3], ls[4])
+            csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
 
         else:
             # Display the message user doesn't register yet
@@ -291,16 +306,16 @@ class UI(QMainWindow):
                 id = self.lbIDUserData.text()[4: len(self.lbIDUserData.text())]
                 if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
                     ls = self.user.getDataUser(id)
-                    self.lbDisplayName.setText(ls[0])
-                    self.lbIDUserData.setText('ID: ' + ls[1])
-                    self.lbDisplayAddress.setText(ls[2])
-                    self.lbDisplayCity.setText(ls[3])
-                    self.lbDisplayCountry.setText(ls[4])
+                    self.lbDisplayName.setText(ls[infor_user['Name']])
+                    self.lbIDUserData.setText('ID: ' + ls[infor_user['ID']])
+                    self.lbDisplayAddress.setText(ls[infor_user['Address']])
+                    self.lbDisplayCity.setText(ls[infor_user['City']])
+                    self.lbDisplayCountry.setText(ls[infor_user['Country']])
                     self.lbViewUser.setScaledContents(True)
-                    self.lbViewUser.setPixmap(QPixmap(ls[6]))
-                    
-                    # logging data to  attendace list (using id card)
-                    csv_data_logging(ls[0], ls[1], ls[2], ls[3], [4])
+                    self.lbViewUser.setPixmap(QPixmap(ls[infor_user['Images']]))
+                                    
+                    # logging data to  attendace list (using face recognition)
+                    csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
 
                 else:
                     # Display the message user doesn't register yet
@@ -426,11 +441,11 @@ class UI(QMainWindow):
     def displayEditUser(self):
         # display data user to edit
         user = self.user.getDataUser(self.idUser)
-        self.textName.setPlainText(user[0])  
-        self.textAddress.setPlainText(user[2]) 
-        self.textCity.setPlainText(user[3]) 
-        self.textCountry.setPlainText(user[4]) 
-        self.imagePath = user[6]
+        self.textName.setPlainText(user[infor_user['Name']])  
+        self.textAddress.setPlainText(user[infor_user['Address']]) 
+        self.textCity.setPlainText(user[infor_user['City']]) 
+        self.textCountry.setPlainText(user[infor_user['Country']]) 
+        self.imagePath = user[infor_user['Images']]
         
         # display the image to button
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
@@ -516,18 +531,18 @@ class UI(QMainWindow):
                     oldUser = self.user.getDataUser(self.idUser)
                     if oldUser[0] != self.name:
                         print('updating name for the user')
-                        self.user.updateUser(self.idUser, table_columns_elements[0], self.name)
+                        self.user.updateUser(self.idUser, table_columns_elements[infor_user['Name']], self.name)
                     if oldUser[2] != self.address:
                         print('updating address for the user')
-                        self.user.updateUser(self.idUser, table_columns_elements[2], self.address)
+                        self.user.updateUser(self.idUser, table_columns_elements[infor_user['Address']], self.address)
                     if oldUser[3] != self.city:
                         print('updating city for the user')
-                        self.user.updateUser(self.idUser, table_columns_elements[3], self.city)
+                        self.user.updateUser(self.idUser, table_columns_elements[infor_user['City']], self.city)
                     if oldUser[4] != self.country:
                         print('updating country for the user')
-                        self.user.updateUser(self.idUser, table_columns_elements[4], self.country)
+                        self.user.updateUser(self.idUser, table_columns_elements[infor_user['Country']], self.country)
                     print('updating time register for the user')
-                    self.user.updateUser(self.idUser, table_columns_elements[5], self.timeRegister)
+                    self.user.updateUser(self.idUser, table_columns_elements[infor_user['Time']], self.timeRegister)
                     
                     # convert flagUpdate
                     self.flagUpdate = False
