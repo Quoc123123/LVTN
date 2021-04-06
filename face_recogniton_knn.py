@@ -238,6 +238,7 @@ class RecognitionUser():
 
         # Use the KNN model to find the best matches for the test face
         closest_distances = knn_clf.kneighbors(faces_encodings, n_neighbors=1)
+
         are_matches = [closest_distances[0][i][0] <= distance_threshold for i in range(len(X_face_locations))]
 
         # Predict classes and remove classifications that aren't within the threshold
@@ -288,7 +289,11 @@ class RecognitionUser():
         
         # loop over the frames from the video stream
         # while cv2.getWindowProperty('Video', 0) >= 0:
-        check_number = 0
+        check_number_unknow = 0
+        flag_check_unknow = True
+        check_number_user = 0
+        flag_check_user = True
+
         while cv2.getWindowProperty('Video', 0) >= 0:
             # Capture frame-by-frame
             ret, frame = video_capture.read()
@@ -307,14 +312,38 @@ class RecognitionUser():
                 # Find all people in the image using a trained classifier model
                 # Note: You can pass in either a classifier file name or a classifier model instance
                 predictions = self.predict(full_file_path, model_path=OUTPUT_TRAINING_DIR)
+                if len(predictions) == 0:
+                    print('No faces are found in the image')
+                    video_capture.release()
+                    cv2.destroyAllWindows()
+                    return list((None, 0, None))
+                print('predictions', predictions)
 
-                    
+                # check how many faces were recognized at this time     
+                if len(predictions) > 1:
+                    print('Number of faces were recognized: ', len(predictions))
+                    video_capture.release()
+                    cv2.destroyAllWindows()
+                    return list((False, 2, None))
+
                 # Display results overlaid on an image
                 pil_image = Image.open(full_file_path).convert("RGB")
                 draw = ImageDraw.Draw(pil_image)
 
                 for name, (top, right, bottom, left) in predictions:
                     print("- Found {} at ({}, {})".format(name, left, top))
+                    if flag_check_unknow:
+                        if name == 'unknow':
+                            check_number_unknow += 1
+                        else:
+                            flag_check_unknow == False
+                        
+                    if flag_check_unknow and check_number_unknow >= 5:
+                        print('Unknow user')
+                        video_capture.release()
+                        cv2.destroyAllWindows()
+                        return list((False, 1, 'unknow'))
+
                     # Draw a box around the face using the Pillow module
                     cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 1)
 
@@ -322,19 +351,20 @@ class RecognitionUser():
                     text_width, text_height = draw.textsize(name)
                 
                     cv2.rectangle(frame, (left, bottom - text_height - 10), (right, bottom), (255, 0, 0), -1)
-                    infor = self.userInfor.getDataUser(str(name))
-                    print('User recognized: ', infor)
-                    cv2.putText(frame, infor[0], (left + 6, bottom - text_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    # infor = self.userInfor.getDataUser(str(name))
+                    # print('User recognized: ', infor)
+                    cv2.putText(frame, str(name), (left + 6, bottom - text_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     # Show infor user
                     cv2.imshow('Video', frame)
 
-                    check_number += 1
-                    print(check_number)
-                    if check_number >= 3:
+                    if name != 'unknow':
+                        check_number_user += 1
+                        
+                    if check_number_user >= 5:
+                        print('recognized user:', str(name))
                         video_capture.release()
                         cv2.destroyAllWindows()
-                        return infor[1]
-                    
+                        return list((True, 1, str(name)))
 
             key = cv2.waitKey(1) & 0xFF
             # if the `q` key was pressed, break from the loop

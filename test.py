@@ -503,7 +503,9 @@ abc = RecognitionUser()
 # abc.getDataSet('123')
 # abc.facial_landmarks('123')
 # abc.trainingUser()
-abc.recognitionUser()
+print(abc.recognitionUser())
+
+
 
 
 
