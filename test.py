@@ -500,8 +500,7 @@ from face_recogniton_knn import *
 
 
 abc = RecognitionUser()
-# abc.getDataSet('123')
-# abc.facial_landmarks('123')
+# abc.facial_landmarks('456')
 # abc.trainingUser()
 print(abc.recognitionUser())
 

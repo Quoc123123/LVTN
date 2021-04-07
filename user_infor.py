@@ -361,7 +361,7 @@ class UserInfor:
                     print('exist data user: {}'.format(row[:-1]))
                     self.mysqlDisconnect()
                     return mysql_query_status['USER_EXIST']
-            print('User register yet')
+            print("User doesn't register yet")
             self.mysqlDisconnect()
             return mysql_query_status['USER_NOT_EXIST']    
                 

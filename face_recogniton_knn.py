@@ -15,10 +15,9 @@ from recognition.face_recognition.face_recognition_cli import image_files_in_fol
 from user_infor import *
 
 # Path for face image database
-INPUT_TRAINING_DIR = 'recognition/knn_examples/train'
+INPUT_TRAINING_DIR = 'recognition/dataset/train'
 INPUT_TEST_DIR = 'recognition/dataset/test'
 OUTPUT_TRAINING_DIR = 'recognition/output/trained_knn_model.clf'
-
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -63,13 +62,13 @@ class RecognitionUser():
         print("[INFO] loading facial landmark predictor...")
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor(face_recognition_models.pose_predictor_model_location())
+        fa = FaceAligner(predictor)
 
         video_capture = cv2.VideoCapture(0)
         cv2.imshow('Video', np.empty((5,5),dtype=float))
         
         # total number of faces written to disk
         total = 0
-
 
         # loop over the frames from the video stream
         while cv2.getWindowProperty('Video', 0) >= 0:
@@ -106,13 +105,20 @@ class RecognitionUser():
 
                 # x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
                 (x, y, w, h) = face_utils.rect_to_bb(rect)
+                
+                # get image to write and align it
+                # output_img = frame[y:y + h, x:x + w].copy()
+                faceAligned = fa.align(frame, gray, rect)
+                # cv2.imshow("Aligned", faceAligned)
+
+	            
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
 
                 # loop over the (x, y)-coordinates for the facial landmarks
                 # and draw them on the image
                 for (x, y) in shape:
                     cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
-            cv2.imshow("Frame", frame)
+                cv2.imshow("Frame", frame)
 
             time.sleep(0.2)
             p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
@@ -120,7 +126,7 @@ class RecognitionUser():
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
             total += 1
-            cv2.imwrite(p, orig)
+            cv2.imwrite(p, faceAligned)
 
             if total >= 10:
                 break
@@ -199,7 +205,7 @@ class RecognitionUser():
 
         return knn_clf
 
-    def predict(self, X_img_path, knn_clf=None, model_path=None, distance_threshold=0.6):
+    def predict(self, X_img_path, knn_clf=None, model_path=None, distance_threshold=0.3):
         """
         Recognizes faces in given image using a trained KNN classifier
 
