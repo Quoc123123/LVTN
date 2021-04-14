@@ -1,7 +1,6 @@
 import serial
 import time 
 from smart_util import *
-import serial.tools.list_ports_windows
 from PyQt5.QtWidgets import QMessageBox
 
 
@@ -37,6 +36,9 @@ rx_msg_status = {
     'TIME_OUT': 3
 }
 
+SERIAL_PORT = '/dev/ttyUSB0'
+BAUDRATE = 19200
+
 
 class SerialComm:
     def __init__(self):
@@ -57,10 +59,10 @@ class SerialComm:
         self.rfid_header = headerFrame['NO_RFID_HEADER']
         self.return_data = b''
 
-    def connectSerial(self, serialPort, baudRate):
+    def connectSerial(self):
         # Init the serial port
-        self.ser = serial.Serial(port=serialPort,
-                                baudrate=baudRate,
+        self.ser = serial.Serial(port= SERIAL_PORT,
+                                baudrate=BAUDRATE,
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
                                 bytesize=serial.EIGHTBITS, timeout = 0)
@@ -68,7 +70,7 @@ class SerialComm:
         # clear buffer input and output                      
         self.emptyBufferSerial(True)
         self.emptyBufferSerial(False)
-        print('Connected {} with Baudrate: {}'.format(serialPort, baudRate))
+        print('Connected {} with Baudrate: {}'.format(SERIAL_PORT, BAUDRATE))
     
     
     def closeSerial(self):
@@ -80,14 +82,14 @@ class SerialComm:
         else:
             self.ser.flushOutput()
 
-    def getPortNumber(self):
-        result = []
-        ports = serial.tools.list_ports_windows.comports(include_links=False)
-        # list port names
-        for port in ports :
-            result.append(port.device)
+    # def getPortNumber(self):
+    #     result = []
+    #     ports = serial.tools.list_ports_windows.comports(include_links=False)
+    #     # list port names
+    #     for port in ports :
+    #         result.append(port.device)
             
-        return result
+    #     return result
 
     # ******************************************************************************************************************
     # Receive Async Data    
@@ -160,7 +162,7 @@ class SerialComm:
         self.tx_message.extend(self._header.encode())
         self._payLoad = len(msg_data)
         self.tx_message.extend(self._payLoad.to_bytes(2, byteorder='big')) 
-        self.tx_message.extend(msg_data.encode()) 
+        # self.tx_message.extend(msg_data.encode()) 
         self.tx_message.extend(self._footer.encode())   
 
         # send data to device

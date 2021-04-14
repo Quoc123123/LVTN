@@ -11,7 +11,7 @@ from user_infor import *
 from face_recogniton_knn import *
 
 
-listPort = []
+# listPort = []
 listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
 PATH_IMAGE_USER = 'picture/image_user/'
@@ -139,10 +139,10 @@ class UI(QMainWindow):
     # add listport into ComboBox
     def addComPortBaudrate(self):
         # add comport
-        listPort = self.ser.getPortNumber()
-        print(listPort)
-        for port in listPort:
-            self.cbxScanPort.addItem(port)
+        # listPort = self.ser.getPortNumber()
+        # print(listPort)
+        # for port in listPort:
+        #     self.cbxScanPort.addItem(port)
 
         # add baudrate
         print(listBaudRate)
@@ -175,11 +175,6 @@ class UI(QMainWindow):
     def connectComport(self):
         try:
             if self.flagConnect == False:
-                comport = self.cbxScanPort.currentText()
-                baurate = self.cbxBaudRate.currentText()
-                print(comport)
-                print(baurate)
-
                 # connecting to port and baudrate
                 self.ser.connectSerial(serialPort=comport, baudRate=baurate)
                 self.btnConnect.setText('Disconnect')
