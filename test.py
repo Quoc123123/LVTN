@@ -1,11 +1,12 @@
-# from serial_attendance import *
+from serial_attendance import *
 
 
-# ser = SerialComm()
-# ser.connectSerial("COM11", 19200)
-# while 1:
-#     a, data = ser.get_data_from_device()
-#     print(data)
+ser = SerialComm()
+ser.connectSerial("COM11", 19200)
+# ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
+while 1:
+    a, data = ser.get_data_from_device()
+    print(data)
    
 
 
@@ -496,13 +497,13 @@
 # sendEmailToAdmin()
 
 
-from face_recogniton_knn import *
+# from face_recogniton_knn import *
 
 
-abc = RecognitionUser()
+# abc = RecognitionUser()
 # abc.facial_landmarks('456')
 # abc.trainingUser()
-print(abc.recognitionUser())
+# print(abc.recognitionUser())
 
 
 

@@ -32,7 +32,6 @@ infor_user = {
 }
 
 
-
 # ******************************************************************************************************************
 # PageOne of UI  
 # ******************************************************************************************************************
@@ -246,13 +245,14 @@ class UI(QMainWindow):
 
     def recognitionUser(self):
         if self.radioUsingCard.isChecked():
-            self.scanTagsUserData(5)
+            self.usingTagsecognition(5)
         else:
-            self.usingFaceRecogniton()
+            self.usingFaceRecognition()
     
-    def usingFaceRecogniton(self):
+    def usingFaceRecognition(self):
         ret = self.faceRecognition.recognitionUser()
         if not ret[0]:
+            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
             #TODO: Display on ui which was failed
             return 
         id = ret[2]
@@ -269,7 +269,12 @@ class UI(QMainWindow):
             # logging data to  attendace list (using face recognition)
             csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
 
+            # send command to notify this user was recognized
+            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
         else:
+            # send command to notify this user doesn't recognition
+            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+
             # Display the message user doesn't register yet
             msg = QMessageBox() 
             msg.setWindowTitle("information")
@@ -279,7 +284,7 @@ class UI(QMainWindow):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
-    def scanTagsUserData(self, timeout):
+    def usingTagsecognition(self, timeout):
         start_time = time.time()
         while(True):
             if time.time() - start_time > timeout:
@@ -296,6 +301,7 @@ class UI(QMainWindow):
             checkData, receiveData = self.ser.get_data_from_device()
             
             if checkData > 0:
+                print('DEBUG: {}'.format(receiveData))
                 # Processing receive data
                 self.dataDisplay = ''
                 for i in range(len(receiveData)):
@@ -316,8 +322,10 @@ class UI(QMainWindow):
                                     
                     # logging data to  attendace list (using face recognition)
                     csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
+                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
 
                 else:
+                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
                     # Display the message user doesn't register yet
                     msg = QMessageBox() 
                     msg.setWindowTitle("information")

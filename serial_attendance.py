@@ -17,6 +17,12 @@ RFID_REQ_MSG_ID = 0x21
 RFID_ACK_MSG_ID = 0xC1
 RFID_NACK_MSG_ID = 0xC2
 
+# Command control device
+rfid_command_id = {
+    'RFID_CMD_OPEN_DOOR'    : 1,
+    'RFID_CMD_CLOSE_DOOR'   : 2,
+}
+
 # header
 RDID_HEADER: str = "RFIC"
 PING_HEADER: str = "RFIP"
@@ -30,14 +36,6 @@ headerFrame = {'NO_RFID_HEADER': 0,
                'RFID_ACK': 2, 
                'RFID_NACK': 3}
 
-
-rx_msg_status = {
-    'OK': 1,
-    'INVALID': 2,
-    'TIME_OUT': 3
-}
-
-
 class SerialComm:
     def __init__(self):
         self._payLoad = 0
@@ -46,6 +44,7 @@ class SerialComm:
         self.tx_message = []
         self.receiveParams = []
         self.sendParams = []
+        self.isIgnoreData = False
 
 
         # variable for receive function
@@ -66,8 +65,8 @@ class SerialComm:
                                 bytesize=serial.EIGHTBITS, timeout = 0)
                                 
         # clear buffer input and output                      
-        self.emptyBufferSerial(True)
-        self.emptyBufferSerial(False)
+        self.ser.flushOutput()
+        self.ser.flushInput()
         print('Connected {} with Baudrate: {}'.format(serialPort, baudRate))
     
     
@@ -96,39 +95,49 @@ class SerialComm:
     def get_data_from_device(self):
         ret = 0
         # receive data from serial port
-        if self.ser.inWaiting():
-            self.received_idx += 1
-            self.receive_data += self.ser.read()
-            
-            if self.rfid_header == headerFrame['NO_RFID_HEADER']:
-                # Validate header frame
-                if self.received_idx == RFID_FRAME_HEADER_SIZE:
-                    if self.receive_data == b'RFIR':
-                        self.rfid_header = headerFrame['RFID_RESPONSE']
-                    elif self.receive_data == b'AACK':
-                        self.rfid_header = headerFrame['RFID_ACK']
-                    elif self.receive_data == b'NACK':
-                        self.rfid_header = headerFrame['RFID_NACK']   
-                    else:   
-                        self.rfid_header = headerFrame['NO_RFID_HEADER']                
-                        self.received_idx -= 1
-                        self.receive_data = self.receive_data[1:RFID_FRAME_HEADER_SIZE]    
+        if self.isIgnoreData:
+            while self.ser.inWaiting() > 0:
+                self.ser.read()
+            self.isIgnoreData = False
 
-            if self.rfid_header == headerFrame['RFID_RESPONSE']:
-                # TODO: get payload lenght
-                frame_size = RFID_FRAME_HEADER_SIZE + RFID_FRAME_DATA_SIZE + RFID_FRAME_FOOTER_SIZE
-                                                        
-                # Keep receive data until reach end of frame
-                if self.received_idx == frame_size:
-                    # Validate footer frame
-                    if self.receive_data[(self.received_idx - RFID_FRAME_FOOTER_SIZE): self.received_idx] == b'$$$$':
-                        print("Received: ", self.receive_data)
-                        ret = len(self.receive_data)
-                        self.return_data = self.receive_data[RFID_FRAME_HEADER_SIZE: ret - RFID_FRAME_FOOTER_SIZE]
-                    self.rfid_header = headerFrame['NO_RFID_HEADER']
-                    self.receive_data = b''
-                    self.received_idx = 0
-        return ret, self.return_data       
+        if not self.isIgnoreData:
+            if self.ser.inWaiting():
+                self.received_idx += 1
+                self.receive_data += self.ser.read()
+                print('inWaiting: {}'.format(self.ser.inWaiting()))
+                
+                if self.rfid_header == headerFrame['NO_RFID_HEADER']:
+                    # Validate header frame
+                    if self.received_idx == RFID_FRAME_HEADER_SIZE:
+                        if self.receive_data == b'RFIR':
+                            self.rfid_header = headerFrame['RFID_RESPONSE']
+                        elif self.receive_data == b'AACK':
+                            self.rfid_header = headerFrame['RFID_ACK']
+                        elif self.receive_data == b'NACK':
+                            self.rfid_header = headerFrame['RFID_NACK']   
+                        else:   
+                            self.rfid_header = headerFrame['NO_RFID_HEADER']                
+                            self.received_idx -= 1
+                            self.receive_data = self.receive_data[1:RFID_FRAME_HEADER_SIZE]    
+
+                if self.rfid_header == headerFrame['RFID_RESPONSE']:
+                    # TODO: get payload lenght
+                    frame_size = RFID_FRAME_HEADER_SIZE + RFID_FRAME_DATA_SIZE + RFID_FRAME_FOOTER_SIZE
+                                                            
+                    # Keep receive data until reach end of frame
+                    if self.received_idx == frame_size:
+                        # Validate footer frame
+                        if self.receive_data[(self.received_idx - RFID_FRAME_FOOTER_SIZE): self.received_idx] == b'$$$$':
+                            print("Received: ", self.receive_data)
+                            ret = len(self.receive_data)
+                            self.return_data = self.receive_data[RFID_FRAME_HEADER_SIZE: ret - RFID_FRAME_FOOTER_SIZE]
+
+                        self.rfid_header = headerFrame['NO_RFID_HEADER']
+                        self.receive_data = b''
+                        self.received_idx = 0
+                        self.isIgnoreData = True
+                    
+            return ret, self.return_data       
 
     # ******************************************************************************************************************
     # Send Async Data    
@@ -160,10 +169,10 @@ class SerialComm:
         self.tx_message.extend(self._header.encode())
         self._payLoad = len(msg_data)
         self.tx_message.extend(self._payLoad.to_bytes(2, byteorder='big')) 
-        self.tx_message.extend(msg_data.encode()) 
+        self.tx_message.extend(msg_data) 
         self.tx_message.extend(self._footer.encode())   
 
         # send data to device
-        self.emptyBufferSerial(False)
+        self.ser.flushOutput()
         self.ser.write(self.tx_message)
         print("Send cmd:", bytearray(self.tx_message))
