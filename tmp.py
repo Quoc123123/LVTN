@@ -24,7 +24,7 @@ class UI(QWidget):
         # *********************************************************
         # Load and setting the default when opening the GUI
         # *********************************************************
-        loadUi('design_ui/main.ui', self)
+        loadUi('design_ui/tmp.ui', self)
         self.setWindowTitle('QuocBrave')
 
         # *********************************************************

@@ -129,6 +129,9 @@ class UI(QMainWindow):
         
         # The variable contains the amount of data registerd 
         self.numUserRegister = 0
+        
+        self.setFixedWidth(400)
+        self.setFixedHeight(400)
 
         # show init UI
         self.show()
