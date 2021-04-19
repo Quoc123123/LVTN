@@ -14,12 +14,15 @@ from face_recogniton_knn import *
 listPort = []
 listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
+TIME_WATTING_READING = 5
+
+
 PATH_IMAGE_USER = 'picture/image_user/'
 PATH_IMAGE_TOOLS = 'picture/image_tools/'
 PATH_IMAGE_SAVE = 'picture/image_save/'
+PATH_IMAGE_USER = 'picture/image_user/'
 
 DATASET_TRAINING_PATH = 'recognition/dataset/'
-
 
 infor_user = {
     'Name'              : 0,
@@ -124,7 +127,6 @@ class UI(QMainWindow):
         self.country = ''
         self.timeRegister = ''
         self.imagePath = ''
-
         
         # The variable contains the amount of data registerd 
         self.numUserRegister = 0
@@ -245,7 +247,7 @@ class UI(QMainWindow):
 
     def recognitionUser(self):
         if self.radioUsingCard.isChecked():
-            self.usingTagsecognition(5)
+            self.usingTagsecognition(TIME_WATTING_READING)
         else:
             self.usingFaceRecognition()
     
