@@ -2,11 +2,9 @@ from serial_attendance import *
 
 
 ser = SerialComm()
-ser.connectSerial("COM11", 19200)
-# ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
-while 1:
-    a, data = ser.get_data_from_device()
-    print(data)
+ser.connectSerial()
+ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
+
    
 
 
