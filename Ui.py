@@ -16,7 +16,6 @@ listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
 TIME_WATTING_READING = 5
 
-
 PATH_IMAGE_USER = 'picture/image_user/'
 PATH_IMAGE_TOOLS = 'picture/image_tools/'
 PATH_IMAGE_SAVE = 'picture/image_save/'
@@ -34,11 +33,10 @@ infor_user = {
     'Images'            : 6,
 }
 
-
 # ******************************************************************************************************************
 # PageOne of UI  
 # ******************************************************************************************************************
-class UI(QMainWindow):
+class UI(QWidget):
     def __init__(self):
         super().__init__()
         
@@ -68,7 +66,6 @@ class UI(QMainWindow):
         self.groupBoxImageID.setVisible(False)
         self.addComPortBaudrate()
         
-
         # *********************************************************
         # display time and date on UI
         # *********************************************************
@@ -134,9 +131,8 @@ class UI(QMainWindow):
         # show init UI
         self.show()
         
-# =================================================================================================================
-# Utils for the display
-# =================================================================================================================
+# ******************************************************************************************************************
+# ******************************************************************************************************************
     # add listport into ComboBox
     def addComPortBaudrate(self):
         # add comport
@@ -172,7 +168,7 @@ class UI(QMainWindow):
                 self.flagBlinkConnect = True
                 self.lbConnectImage.setPixmap(QPixmap(''))
 
-    # connect to port from Combobox
+  # connect to port from Combobox
     def connectComport(self):
         try:
             if self.flagConnect == False:
@@ -345,7 +341,7 @@ class UI(QMainWindow):
         self.lbDisplayCountry.setText('Waiting...')
         self.lbIDUserData.setText('ID :_______________________')
         self.lbViewUser.setPixmap(QPixmap(''))
-
+        
 # =================================================================================================================
 # Processing for Register / Edit User
 # =================================================================================================================
@@ -393,7 +389,7 @@ class UI(QMainWindow):
         # self.btnCloseTag.setVisible(True)
         # self.lbLoading.setVisible(True)
 
-        self.receivedDataFromReader(5)
+        self.receivedDataFromReader(TIME_WATTING_READING)
 
     def receivedDataFromReader(self, timeout):
         start_time = time.time()
@@ -460,8 +456,8 @@ class UI(QMainWindow):
         # display the image to button
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
         self.btnBrowseImage.setIcon(QtGui.QIcon(self.imagePath))
-
         print('Infor the user for updating: ', user)
+
 
     def saveRegisterUser(self):
         # fetch the element data from UI
@@ -557,7 +553,7 @@ class UI(QMainWindow):
                     # convert flagUpdate
                     self.flagUpdate = False
                     print('updating for user successfull')
-                    
+
     def clearDisplayData(self):
         self.textName.setText('')
         self.textAddress.setText('')
@@ -697,6 +693,7 @@ class UI(QMainWindow):
 
     def creatingListWidget(self):
        pass
+
 # =================================================================================================================
 # Run the UI
 # =================================================================================================================
@@ -708,5 +705,4 @@ if __name__ == "__main__":
     # widget.addWidget(ui)
     # widget.setFixedWidth(1138)
     # widget.setFixedHeight(844)
-    # widget.show()
     sys.exit(app.exec_())
