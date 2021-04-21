@@ -135,6 +135,8 @@ class UI(QWidget):
 # ******************************************************************************************************************
     # add listport into ComboBox
     def addComPortBaudrate(self):
+        self.clearComportBaudRate()
+
         # add comport
         listPort = self.ser.getPortNumber()
         print(listPort)
@@ -145,8 +147,14 @@ class UI(QWidget):
         print(listBaudRate)
         for baudrate in listBaudRate:
             self.cbxBaudRate.addItem(str(baudrate))
+
         # setting default index
             self.cbxBaudRate.setCurrentIndex(4) 
+
+    def clearComportBaudRate(self):
+        self.cbxScanPort.clear()
+        self.cbxBaudRate.clear()
+
 
     def showDateTime(self):
         # get time from object QDateTime

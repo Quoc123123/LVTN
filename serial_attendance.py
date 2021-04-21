@@ -1,5 +1,7 @@
 import serial
 import time 
+import glob
+import sys
 from smart_util import *
 from PyQt5.QtWidgets import QMessageBox
 
@@ -42,10 +44,6 @@ rx_msg_status = {
     'TIME_OUT': 3
 }
 
-SERIAL_PORT = '/dev/ttyUSB0'
-BAUDRATE = 19200
-
-
 class SerialComm:
     def __init__(self):
         self._payLoad = 0
@@ -66,24 +64,18 @@ class SerialComm:
         self.rfid_header = headerFrame['NO_RFID_HEADER']
         self.return_data = b''
 
-    def connectSerial(self):
+    def connectSerial(self, serialPort, baudRate):
         # Init the serial port
-        self.ser = serial.Serial(port= SERIAL_PORT,
-                                baudrate=BAUDRATE,
+        self.ser = serial.Serial(port= serialPort,
+                                baudrate=baudRate,
                                 parity=serial.PARITY_NONE,
                                 stopbits=serial.STOPBITS_ONE,
                                 bytesize=serial.EIGHTBITS, timeout = 0)
                                 
         # clear buffer input and output                      
-<<<<<<< HEAD
         self.ser.flushOutput()
         self.ser.flushInput()
         print('Connected {} with Baudrate: {}'.format(serialPort, baudRate))
-=======
-        self.emptyBufferSerial(True)
-        self.emptyBufferSerial(False)
-        print('Connected {} with Baudrate: {}'.format(SERIAL_PORT, BAUDRATE))
->>>>>>> Attendance_System/Face_Recognize
     
     
     def closeSerial(self):
@@ -95,14 +87,27 @@ class SerialComm:
         else:
             self.ser.flushOutput()
 
-    # def getPortNumber(self):
-    #     result = []
-    #     ports = serial.tools.list_ports_windows.comports(include_links=False)
-    #     # list port names
-    #     for port in ports :
-    #         result.append(port.device)
-            
-    #     return result
+    def getPortNumber(self):
+        if sys.platform.startswith('win'):
+            ports = ['COM%s' % (i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            # this excludes your current terminal "/dev/tty"
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+            print('ports: ', ports)
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
+
+        result = []
+        for port in ports:
+            try:
+                s = serial.Serial(port)
+                s.close()
+                result.append(port)
+            except (OSError, serial.SerialException):
+                pass
+            return result
 
     # ******************************************************************************************************************
     # Receive Async Data    
@@ -185,14 +190,7 @@ class SerialComm:
         self.tx_message.extend(self._header.encode())
         self._payLoad = len(msg_data)
         self.tx_message.extend(self._payLoad.to_bytes(2, byteorder='big')) 
-<<<<<<< HEAD
-        self.tx_message.extend(msg_data) 
-=======
-        # self.tx_message.extend(msg_data.encode()) 
->>>>>>> Attendance_System/Face_Recognize
         self.tx_message.extend(self._footer.encode())   
-
         # send data to device
-        self.ser.flushOutput()
         self.ser.write(self.tx_message)
         print("Send cmd:", bytearray(self.tx_message))
