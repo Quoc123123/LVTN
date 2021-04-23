@@ -1,11 +1,13 @@
-from serial_attendance import *
+# from serial_attendance import *
 
 
-ser = SerialComm()
-ser.connectSerial()
-# ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
 
-   
+# ser = SerialComm()
+# ser.connectSerial("/dev/ttyUSB0", 19200)
+# # ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
+# while 1:
+#     a, data = ser.get_data_from_device()
+#     print(data)
 
 
 # print(len(a))
@@ -411,16 +413,16 @@ ser.connectSerial()
 # sys.exit(App.exec()) 
 
 
-# from face_attendance import *
-# import time
+from face_recogniton_knn import *
+import time
 
-# test = RecognitionUser()
+test = RecognitionUser()
 
 
-# # test.getDataSet('987654321')
-# # test.trainingUser()
-# a = test.recognitionUser(5)
-# print(a)
+# test.getDataSet('987654321')
+# test.trainingUser()
+a = test.recognitionUser(5)
+print(a)
 # print(type(a[0]))
 # print(type(a[1]))
 
@@ -536,6 +538,11 @@ ser.connectSerial()
 # if __name__ == '__main__':
 #     print(serial_ports())
 
+# from user_infor import *
+
+
+# abc = UserInfor()
+# abc.mysqlConnection()
 
 
 

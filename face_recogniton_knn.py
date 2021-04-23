@@ -121,7 +121,7 @@ class RecognitionUser():
                 cv2.imshow("Frame", frame)
 
             time.sleep(0.2)
-            p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
+            p = os.path.join(INPUT_TRAINING_DIR, ID)
             if not os.path.exists(p):
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
@@ -151,7 +151,7 @@ class RecognitionUser():
         Structure:
             <train_dir>/
             ├── <person1>/
-            │   ├── <somename1>.jpeg
+
             │   ├── <somename2>.jpeg
             │   ├── ...
             ├── <person2>/

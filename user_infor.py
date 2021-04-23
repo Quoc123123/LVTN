@@ -23,9 +23,9 @@ table_columns_elements = {
 dictConnect = {
     'host' : 'localhost',
     'user' : 'root',
-    'password' : '',
+    'password' : 'buivanquoc123',
     'database' : DATABASE_NAME,
-    'port' : 3307,    
+    'port' : 3306,    
 }
 
 mysql_query_status = {
