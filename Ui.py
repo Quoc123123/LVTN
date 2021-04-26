@@ -89,7 +89,6 @@ class UI(QWidget):
 
         # For User Data
         self.btnUserData.clicked.connect(self.userData)
-        
         self.btnFaceRecognition.clicked.connect(self.recognitionUser)
         self.btnClear.clicked.connect(self.clearDataUser)
 
@@ -138,6 +137,7 @@ class UI(QWidget):
             QTableWidget
             {
                 background: #FFFFFF;
+                height: 15px; margin: 0px 20px 0 20px;
             }
             QLabel#lbBaudRate
             {
@@ -235,7 +235,30 @@ class UI(QWidget):
                 border: 1px solid #3A3939;
                 border-radius: 4px;
             }
+            QRadioButton
+            {
+                background-color : #FF0000;
+                color: white;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+
+            QRadioButton::checked
+            {
+                background-color : #0000FF;
+                color: white;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+
             """
+            
 
         self.groupBoxConnection.setStyleSheet("QGroupBox { background-color: \
                                              rgb(51, 255, 255);}")
@@ -426,8 +449,8 @@ class UI(QWidget):
     def styleSheetUserDataDefault(self):
         self.lbDisplayName.setStyleSheet("""QLabel
                                             {
-                                                color: white;
-                                                background-color: #FF0000;
+                                                color: black;
+                                                background-color: #FFF;
                                                 border-style: solid;
                                                 border: 1px solid #3A3939;
                                                 border-radius: 4px;
@@ -436,8 +459,8 @@ class UI(QWidget):
 
         self.lbDisplayAddress.setStyleSheet("""QLabel
                                             {
-                                                color: white;
-                                                background-color: #FF0000;
+                                                color: black;
+                                                background-color: #FFF;
                                                 border-style: solid;
                                                 border: 1px solid #3A3939;
                                                 border-radius: 4px;
@@ -446,8 +469,8 @@ class UI(QWidget):
 
         self.lbDisplayCity.setStyleSheet("""QLabel
                                             {
-                                                color: white;
-                                                background-color: #FF0000;
+                                                color: black;
+                                                background-color: #FFF;
                                                 border-style: solid;
                                                 border: 1px solid #3A3939;
                                                 border-radius: 4px;
@@ -456,8 +479,8 @@ class UI(QWidget):
 
         self.lbDisplayCountry.setStyleSheet("""QLabel
                                             {
-                                                color: white;
-                                                background-color: #FF0000;
+                                                color: black;
+                                                background-color: #FFF;
                                                 border-style: solid;
                                                 border: 1px solid #3A3939;
                                                 border-radius: 4px;
@@ -529,6 +552,7 @@ class UI(QWidget):
             # set default that using card to recognition user
             self.radioUsingCard.setChecked(True)
             self.styleSheetUserDataDefault()
+
         else: 
             print("Not into user data mode if doesn't yet connect")
             msg = QMessageBox() 
@@ -548,7 +572,7 @@ class UI(QWidget):
     def usingFaceRecognition(self):
         ret = self.faceRecognition.recognitionUser()
         if not ret[0]:
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+            self.control_led_status(True, False)
             #TODO: Display on ui which was failed
             return 
         id = ret[2]
@@ -566,10 +590,10 @@ class UI(QWidget):
             csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
 
             # send command to notify this user was recognized
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
+            self.control_led_status(False, True)
         else:
             # send command to notify this user doesn't recognition
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+            self.control_led_status(True, False)
 
             # Display the message user doesn't register yet
             msg = QMessageBox() 
@@ -618,10 +642,10 @@ class UI(QWidget):
                                     
                     # logging data to  attendace list (using face recognition)
                     csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
-                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
+                    self.control_led_status(False, True)
 
                 else:
-                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+                    self.control_led_status(True, False)
                     # Display the message user doesn't register yet
                     msg = QMessageBox() 
                     msg.setWindowTitle("information")
@@ -638,7 +662,10 @@ class UI(QWidget):
         self.lbDisplayCity.setText('Waiting...')
         self.lbDisplayCountry.setText('Waiting...')
         self.lbIDUserData.setText('ID :_______________________')
-        self.lbViewUser.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'chamhoi.jpg'))
+        self.lbViewUser.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
+        # Turn off lee status
+        self.control_led_status(False, False)
+        
         
 # =================================================================================================================
 # Processing for Register / Edit User
@@ -791,8 +818,6 @@ class UI(QWidget):
                                         }
                                     """)
 
-
-
     def registerUserData(self):
         if self.flagConnect: 
             if self.user.mysqlConnection():
@@ -871,7 +896,6 @@ class UI(QWidget):
 
                 # Disable lable loading
                 self.lbReadingTag.setVisible(False)  
-                self.grapViewImgReadingTag.setVisible(False)
                 self.btnCloseTag.setVisible(False)
                 self.lbLoading.setVisible(False)
 
@@ -1011,7 +1035,7 @@ class UI(QWidget):
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
         self.btnBrowseImage.setIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'Click_to_browse.png'))
         self.imagePath = ''
-        # self.lbViewRegister.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'chamhoi.jpg'))
+        self.lbViewRegister.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
 
     def browseImageUserAndTrain(self):
 
@@ -1101,9 +1125,9 @@ class UI(QWidget):
         self.tableWidget.viewport().installEventFilter(self)
 
         # selecting default the row just to init
-        if self.tableWidget.rowCount() > 0:
-            self.tableWidget.selectRow(0)
-            self.displayImageRegister(0)
+        # if self.tableWidget.rowCount() > 0:
+        #     self.tableWidget.selectRow(0)
+        #     self.displayImageRegister(0)
             
     def updateNumberUser(self):
         # loading  the number of user on database
@@ -1143,6 +1167,26 @@ class UI(QWidget):
     def creatingListWidget(self):
         #TODO:
        pass
+
+# =================================================================================================================
+# Control device and warning it if recognition failed
+# =================================================================================================================
+    def control_led_status(self, led_red_en, led_green_en):
+        ctl_val = 0x01
+        val = 0x00
+        if led_red_en:
+            val |= 0x01
+
+        if led_green_en:
+            val |= 0x02
+
+        
+        if (led_red_en == False) and (led_green_en == False):
+            ctl_val = 0x00
+
+        self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [ctl_val, val]) 
+
+
 
 # =================================================================================================================
 # Run the UI

@@ -1,13 +1,10 @@
-# from serial_attendance import *
+from serial_attendance import *
 
 
-# ser = SerialComm()
-# ser.connectSerial("COM11", 19200)
-# # ser.pc_send_data_to_device(RFID_REQ_MSG_ID,[0x00])
-# while 1:
-#     a, data = ser.get_data_from_device()
-#     print(data)
-   
+ser = SerialComm()
+ser.connectSerial("COM11", 19200)
+ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00, 0x03])
+
 
 
 # print(len(a))
@@ -505,19 +502,18 @@
 # abc.trainingUser()
 # print(abc.recognitionUser())
 
-import cv2
+# import cv2
 
-url = 'http://192.168.1.3:4747/video'
+# url = 'http://192.168.1.3:4747/video'
 
-video = cv2.VideoCapture(url)
+# video = cv2.VideoCapture(url)
 
-while True:
-    ret, frame = video.read()
-    if ret == True:
-        cv2.imshow('IPCam', frame)
-    if cv2.waitKey(1) == ord('q'):
-        break
-
+# while True:
+#     ret, frame = video.read()
+#     if ret == True:
+#         cv2.imshow('IPCam', frame)
+#     if cv2.waitKey(1) == ord('q'):
+#         break
 
 
 
