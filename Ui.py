@@ -34,9 +34,9 @@ infor_user = {
 }
 
 
-# ******************************************************************************************************************
+# *********************************************************************************
 # PageOne of UI  
-# ******************************************************************************************************************
+# *********************************************************************************
 class UI(QWidget):
     def __init__(self):
         super().__init__()
@@ -46,6 +46,7 @@ class UI(QWidget):
         # *********************************************************
         loadUi('design_ui/Ui.ui', self)
         self.setWindowTitle('Attendance System')
+        self.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'logo.png'))
 
         # *********************************************************
         # Creating class elements for UI
@@ -286,8 +287,9 @@ class UI(QWidget):
         # show init UI
         self.show()
 
-# =========================================================================================
-# =========================================================================================
+# *********************************************************************************
+# Setup com port and datatime
+# *********************************************************************************
     # add listport into ComboBox
     def addComPortBaudrate(self):
         # clear data before
@@ -385,9 +387,9 @@ class UI(QWidget):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
-# =================================================================================================================
+# ==================================================================================
 # Processing for conection button
-# =================================================================================================================
+# ==================================================================================
     def connectionSetting(self):
         self.groupBoxConnection.setVisible(True)
         self.groupBoxUserData.setVisible(False) 
@@ -443,9 +445,9 @@ class UI(QWidget):
                                         }
                                     """)
         
-# =================================================================================================================
+# ==================================================================================
 # Processing for user Data button
-# =================================================================================================================
+# ==================================================================================
     def styleSheetUserDataDefault(self):
         self.lbDisplayName.setStyleSheet("""QLabel
                                             {
@@ -667,9 +669,9 @@ class UI(QWidget):
         self.control_led_status(False, False)
         
         
-# =================================================================================================================
+# ================================================================================
 # Processing for Register / Edit User
-# =================================================================================================================
+# ================================================================================
     def styleSheetRegisterUserDefault(self):
         self.btnEditData.setStyleSheet(
                                     """QPushButton
@@ -823,6 +825,7 @@ class UI(QWidget):
             if self.user.mysqlConnection():
                 self.styleSheetRegisterUserDefault()
                 self.clearDisplayData()
+                self.animationLoading()
 
                 # setting multi-media for the display 
                 self.groupBoxConnection.setVisible(True)
@@ -831,7 +834,6 @@ class UI(QWidget):
 
                 self.lbReadingTag.setVisible(False)  
                 self.btnCloseTag.setVisible(False)
-                self.lbLoading.setVisible(False)
 
                 self.radioSearchName.setChecked(True)
                 self.displayTable()
@@ -856,7 +858,20 @@ class UI(QWidget):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
+    def animationLoading(self):
+        self.movie = QMovie(PATH_IMAGE_TOOLS + '3.jpg')
+        self.lbMovie.setMovie(self.movie)
+
+    # Start Animation
+    def startAnimation(self):
+        self.movie.start()
+
+    # Stop Animation(According to need)
+    def stopAnimation(self):
+        self.movie.stop()
+        
     def scanTagsUserRegister(self):
+        # self.startAnimation()
         # self.lbReadingTag.setVisible(True)  
         # self.grapViewImgReadingTag.setVisible(True)
         # self.btnCloseTag.setVisible(True)
@@ -1123,11 +1138,6 @@ class UI(QWidget):
 
         # add event when the mouse is click by the admin
         self.tableWidget.viewport().installEventFilter(self)
-
-        # selecting default the row just to init
-        # if self.tableWidget.rowCount() > 0:
-        #     self.tableWidget.selectRow(0)
-        #     self.displayImageRegister(0)
             
     def updateNumberUser(self):
         # loading  the number of user on database
@@ -1168,9 +1178,9 @@ class UI(QWidget):
         #TODO:
        pass
 
-# =================================================================================================================
+# ================================================================================
 # Control device and warning it if recognition failed
-# =================================================================================================================
+# ================================================================================
     def control_led_status(self, led_red_en, led_green_en):
         ctl_val = 0x01
         val = 0x00
@@ -1187,10 +1197,9 @@ class UI(QWidget):
         self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [ctl_val, val]) 
 
 
-
-# =================================================================================================================
+# ================================================================================
 # Run the UI
-# =================================================================================================================
+# ================================================================================
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
