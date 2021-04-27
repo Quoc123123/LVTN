@@ -918,7 +918,7 @@ class UI(QWidget):
                 # Disable lable loading
                 self.lbReadingTag.setVisible(False)  
                 self.btnCloseTag.setVisible(False)
-                self.lbLoading.setVisible(False)
+            
 
                 # Check the data exits or not 
                 status = self.user.checkDataUser(self.idUser)
