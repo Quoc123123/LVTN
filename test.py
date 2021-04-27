@@ -517,6 +517,11 @@ abc = RecognitionUser()
 # abc.trainingUser()
 print(abc.recognitionUser())
 
+# import cv2
+
+# url = 'http://192.168.1.3:4747/video'
+
+# video = cv2.VideoCapture(url)
 
 # import sys
 # import glob
@@ -556,5 +561,50 @@ print(abc.recognitionUser())
 # abc = UserInfor()
 # abc.mysqlConnection()
 
+import sys
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QMovie
+from PyQt5.QtCore import Qt
+import time
+  
+class LoadingGif(object):
+  
+    def mainUI(self, FrontWindow):
+        FrontWindow.setObjectName("FTwindow")
+        FrontWindow.resize(320, 300)
+        self.centralwidget = QtWidgets.QWidget(FrontWindow)
+        self.centralwidget.setObjectName("main-widget")
+  
+        # Label Create
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(25, 25, 200, 200))
+        self.label.setMinimumSize(QtCore.QSize(250, 250))
+        self.label.setMaximumSize(QtCore.QSize(250, 250))
+        self.label.setObjectName("lb1")
+        FrontWindow.setCentralWidget(self.centralwidget)
+  
+        # Loading the GIF
+        self.movie = QMovie('picture/image_tools/' + "3.jpg")
+        self.label.setMovie(self.movie)
+  
+        self.startAnimation()
+  
+  
+    # Start Animation
+  
+    def startAnimation(self):
+        self.movie.start()
+  
+    # Stop Animation(According to need)
+    def stopAnimation(self):
+        self.movie.stop()
+  
+  
+app = QtWidgets.QApplication(sys.argv)
+window = QtWidgets.QMainWindow()
+demo = LoadingGif()
+demo.mainUI(window)
+window.show()
+sys.exit(app.exec_())
 
 

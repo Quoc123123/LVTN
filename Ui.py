@@ -33,9 +33,10 @@ infor_user = {
     'Images'            : 6,
 }
 
-# ******************************************************************************************************************
+
+# *********************************************************************************
 # PageOne of UI  
-# ******************************************************************************************************************
+# *********************************************************************************
 class UI(QWidget):
     def __init__(self):
         super().__init__()
@@ -45,6 +46,7 @@ class UI(QWidget):
         # *********************************************************
         loadUi('design_ui/Ui.ui', self)
         self.setWindowTitle('Attendance System')
+        self.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'logo.png'))
 
         # *********************************************************
         # Creating class elements for UI
@@ -88,7 +90,6 @@ class UI(QWidget):
 
         # For User Data
         self.btnUserData.clicked.connect(self.userData)
-        
         self.btnFaceRecognition.clicked.connect(self.recognitionUser)
         self.btnClear.clicked.connect(self.clearDataUser)
 
@@ -127,15 +128,172 @@ class UI(QWidget):
         
         # The variable contains the amount of data registerd 
         self.numUserRegister = 0
+        
+        # set up stydesheet
+        style = """
+            QWidget
+            {
+                background: #262D37;
+            }
+            QTableWidget
+            {
+                background: #FFFFFF;
+                height: 15px; margin: 0px 20px 0 20px;
+            }
+            QLabel#lbBaudRate
+            {
+                color: white;
+                background-color: #0577a8;
+                selection-background-color: #3d8ec9;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+            QLabel#lbConnectionStatus
+            {
+                color: white;
+                background-color: #0577a8;
+                selection-background-color: #3d8ec9;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+
+            QLabel#lbDateTime
+            {
+                color: white;
+                background-color: #0577a8;
+                selection-background-color: #3d8ec9;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+
+            QLabel#lbName, QLabel#lbAddress, QLabel#lbCity, QLabel#lbCountry, QLabel#lbID, QLabel#lbSearch
+            {
+                color: white;
+                background-color: #0000FF;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+
+            QLabel#lbIDUserData
+            {
+                color: white;
+                background-color: #0000FF;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+
+            QPushButton#btnConnection, QPushButton#btnUserData, QPushButton#btnEditData, 
+            QPushButton#btnScanPort, QPushButton#btnFaceRecognition, QPushButton#btnClear,
+            QPushButton#btnSaveDataUser, QPushButton#btnClearDataInput, QPushButton#btnScanRegister
+            {
+                color: white;
+                background-color: #0577a8;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+            QPushButton:hover#btnConnection, QPushButton:hover#btnUserData, QPushButton:hover#btnEditData,
+            QPushButton:hover#btnScanPort, QPushButton:hover#btnFaceRecognition, QPushButton:hover#btnClear,
+            QPushButton:hover#btnSaveDataUser, QPushButton:hover#btnClearDataInput, QPushButton:hover#btnScanRegister
+            {
+                border: 2px #000 solid;
+                border-radius: 5px;
+                background: #21E234;
+            }
+            QPushButton#btnConnect
+            {
+                color: white;
+                background-color: #0000FF;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+
+            QComboBox#cbxScanPort
+            {
+                color: black;
+                background: white;
+                selection-background-color: #3d8ec9;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+            QComboBox#cbxBaudRate
+            {
+                color: black;
+                background: white;
+                selection-background-color: #3d8ec9;
+                border-style: solid;
+                border: 1px solid #3A3939;
+                border-radius: 4px;
+            }
+            QRadioButton
+            {
+                background-color : #FF0000;
+                color: white;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+
+            QRadioButton::checked
+            {
+                background-color : #0000FF;
+                color: white;
+                border: 2px #DADADA solid;
+                padding: 5px 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+
+            """
+            
+
+        self.groupBoxConnection.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(51, 255, 255);}")
+                                             
+        self.groupBoxUserData.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(51, 255, 255);}")
+
+        self.groupBoxImageID.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(51, 255, 255);}")
+
+        self.groupBoxDetailData.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(57, 252, 206);}")
+
+        self.groupBoxImg.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(255, 255, 255);}")
+
+        self.groupBoxImageID.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(51, 255, 255);}")
+
+        self.groupBoxRecordViewRecord.setStyleSheet("QGroupBox { background-color: \
+                                             rgb(57, 252, 206);")
+
+        self.setStyleSheet(style)
 
         # show init UI
         self.show()
-        
-# ******************************************************************************************************************
-# ******************************************************************************************************************
+
+# *********************************************************************************
+# Setup com port and datatime
+# *********************************************************************************
     # add listport into ComboBox
     def addComPortBaudrate(self):
-        self.clearComportBaudRate()
+        # clear data before
+        self.cbxScanPort.clear()
 
         # add comport
         listPort = self.ser.getPortNumber()
@@ -192,7 +350,19 @@ class UI(QWidget):
                 self.lbConnectImage.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'Connected.png'))
                 self.lbConnectImage.setScaledContents(True)
                 self.flagConnect = True
-                pass
+
+                self.btnConnect.setStyleSheet(
+                                                """QPushButton
+                                                {
+                                                    color: white;
+                                                    background-color: #FF0000;
+                                                    border: 2px #DADADA solid;
+                                                    padding: 8px 10px;
+                                                    border-radius: 5px;
+                                                    font-weight: bold;
+                                                    font-size: 9pt;
+                                                }""")
+
             else:
                 self.ser.closeSerial()
                 self.btnConnect.setText('Connect')
@@ -201,6 +371,17 @@ class UI(QWidget):
                 self.lbConnectImage.setScaledContents(True)
                 self.flagConnect = False
                 print('Closed serial port')
+                self.btnConnect.setStyleSheet(
+                                            """QPushButton
+                                            {
+                                                color: white;
+                                                background-color: #0000FF;
+                                                border: 2px #DADADA solid;
+                                                padding: 8px 10px;
+                                                border-radius: 5px;
+                                                font-weight: bold;
+                                                font-size: 9pt;
+                                            }""")
 
         except Exception as exc:
             print('Error creating serialDevice')
@@ -212,23 +393,163 @@ class UI(QWidget):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
-# =================================================================================================================
+# ==================================================================================
 # Processing for conection button
-# =================================================================================================================
+# ==================================================================================
     def connectionSetting(self):
-        self.lb_select.setGeometry(-10, 320, 51, 61)
         self.groupBoxConnection.setVisible(True)
         self.groupBoxUserData.setVisible(False) 
         self.groupBoxImageID.setVisible(False)
+        self.btnConnection.setStyleSheet(
+                                    """QPushButton
+                                    {
+                                        color: white;
+                                        background-color: #0000FF;
+                                        border: 2px #DADADA solid;
+                                        padding: 5px 10px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        font-size: 9pt;
+                                    }""")
+        self.btnUserData.setStyleSheet(
+                                    """QPushButton
+                                    {
+                                        color: white;
+                                        background-color: #0577a8;
+                                        border: 2px #DADADA solid;
+                                        padding: 5px 10px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        font-size: 9pt;
+                                    }""")
+        self.btnUserData.setStyleSheet(
+                                    """
+                                        QPushButton:hover{
+                                        border: 2px #000 solid;
+                                        border-radius: 5px;
+                                        background: #21E234;
+                                        }
+                                    """)
 
-# =================================================================================================================
+        self.btnEditData.setStyleSheet(
+                                    """QPushButton
+                                    {
+                                        color: white;
+                                        background-color: #0577a8;
+                                        border: 2px #DADADA solid;
+                                        padding: 5px 10px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        font-size: 9pt;
+                                    }""")
+        self.btnEditData.setStyleSheet(
+                                    """
+                                        QPushButton:hover{
+                                        border: 2px #000 solid;
+                                        border-radius: 5px;
+                                        background: #21E234;
+                                        }
+                                    """)
+        
+# ==================================================================================
 # Processing for user Data button
-# =================================================================================================================
+# ==================================================================================
+    def styleSheetUserDataDefault(self):
+        self.lbDisplayName.setStyleSheet("""QLabel
+                                            {
+                                                color: black;
+                                                background-color: #FFF;
+                                                border-style: solid;
+                                                border: 1px solid #3A3939;
+                                                border-radius: 4px;
+                                            }
+                                        """)
+
+        self.lbDisplayAddress.setStyleSheet("""QLabel
+                                            {
+                                                color: black;
+                                                background-color: #FFF;
+                                                border-style: solid;
+                                                border: 1px solid #3A3939;
+                                                border-radius: 4px;
+                                            }
+                                        """)
+
+        self.lbDisplayCity.setStyleSheet("""QLabel
+                                            {
+                                                color: black;
+                                                background-color: #FFF;
+                                                border-style: solid;
+                                                border: 1px solid #3A3939;
+                                                border-radius: 4px;
+                                            }
+                                        """)
+
+        self.lbDisplayCountry.setStyleSheet("""QLabel
+                                            {
+                                                color: black;
+                                                background-color: #FFF;
+                                                border-style: solid;
+                                                border: 1px solid #3A3939;
+                                                border-radius: 4px;
+                                            }
+                                        """)
+
+        self.btnUserData.setStyleSheet(
+                                        """QPushButton
+                                        {
+                                            color: white;
+                                            background-color: #0000FF;
+                                            border: 2px #DADADA solid;
+                                            padding: 5px 10px;
+                                            border-radius: 5px;
+                                            font-weight: bold;
+                                            font-size: 9pt;
+                                        }""")
+
+        self.btnConnection.setStyleSheet(
+                                        """QPushButton
+                                        {
+                                            color: white;
+                                            background-color: #0577a8;
+                                            border: 2px #DADADA solid;
+                                            padding: 5px 10px;
+                                            border-radius: 5px;
+                                            font-weight: bold;
+                                            font-size: 9pt;
+                                        }""")
+        self.btnConnection.setStyleSheet(
+                                        """
+                                            QPushButton:hover{
+                                            border: 2px #000 solid;
+                                            border-radius: 5px;
+                                            background: #21E234;
+                                            }
+                                        """)
+        self.btnEditData.setStyleSheet(
+                                        """QPushButton
+                                        {
+                                            color: white;
+                                            background-color: #0577a8;
+                                            border: 2px #DADADA solid;
+                                            padding: 5px 10px;
+                                            border-radius: 5px;
+                                            font-weight: bold;
+                                            font-size: 9pt;
+                                        }""")
+        self.btnEditData.setStyleSheet(
+                                    """
+                                        QPushButton:hover{
+                                        border: 2px #000 solid;
+                                        border-radius: 5px;
+                                        background: #21E234;
+                                        }
+                                    """)
     def userData(self):
-        self.clearDataUser()
         if self.flagConnect:
+            # clear data display
+            self.clearDataUser()
             # setting multi-media for the  display 
-            self.lb_select.setGeometry(-10, 390, 51, 61)
             self.groupBoxConnection.setVisible(True)
             self.groupBoxUserData.setVisible(True) 
             self.groupBoxImageID.setVisible(False)
@@ -238,6 +559,7 @@ class UI(QWidget):
             
             # set default that using card to recognition user
             self.radioUsingCard.setChecked(True)
+            self.styleSheetUserDataDefault()
 
         else: 
             print("Not into user data mode if doesn't yet connect")
@@ -258,7 +580,7 @@ class UI(QWidget):
     def usingFaceRecognition(self):
         ret = self.faceRecognition.recognitionUser()
         if not ret[0]:
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+            self.control_led_status(True, False)
             #TODO: Display on ui which was failed
             return 
         id = ret[2]
@@ -276,10 +598,10 @@ class UI(QWidget):
             csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
 
             # send command to notify this user was recognized
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
+            self.control_led_status(False, True)
         else:
             # send command to notify this user doesn't recognition
-            self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+            self.control_led_status(True, False)
 
             # Display the message user doesn't register yet
             msg = QMessageBox() 
@@ -328,10 +650,10 @@ class UI(QWidget):
                                     
                     # logging data to  attendace list (using face recognition)
                     csv_data_logging(ls[infor_user['Name']], ls[infor_user['ID']], ls[infor_user['Address']], ls[infor_user['City']], ls[infor_user['Country']])
-                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x01]) 
+                    self.control_led_status(False, True)
 
                 else:
-                    self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [0x00]) 
+                    self.control_led_status(True, False)
                     # Display the message user doesn't register yet
                     msg = QMessageBox() 
                     msg.setWindowTitle("information")
@@ -348,27 +670,178 @@ class UI(QWidget):
         self.lbDisplayCity.setText('Waiting...')
         self.lbDisplayCountry.setText('Waiting...')
         self.lbIDUserData.setText('ID :_______________________')
-        self.lbViewUser.setPixmap(QPixmap(''))
+        self.lbViewUser.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
+        # Turn off lee status
+        self.control_led_status(False, False)
         
-# =================================================================================================================
+        
+# ================================================================================
 # Processing for Register / Edit User
-# =================================================================================================================
+# ================================================================================
+    def styleSheetRegisterUserDefault(self):
+        self.btnEditData.setStyleSheet(
+                                    """QPushButton
+                                    {
+                                        color: white;
+                                        background-color: #0000FF;
+                                        border: 2px #DADADA solid;
+                                        padding: 5px 10px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        font-size: 9pt;
+                                    }""")
+        self.btnConnection.setStyleSheet(
+                                        """QPushButton
+                                        {
+                                            color: white;
+                                            background-color: #0577a8;
+                                            border: 2px #DADADA solid;
+                                            padding: 5px 10px;
+                                            border-radius: 5px;
+                                            font-weight: bold;
+                                            font-size: 9pt;
+                                        }""")
+        self.btnConnection.setStyleSheet(
+                                    """
+                                        QPushButton:hover{
+                                        border: 2px #000 solid;
+                                        border-radius: 5px;
+                                        background: #21E234;
+                                        }
+                                    """)
+
+        self.btnUserData.setStyleSheet(
+                                    """QPushButton
+                                    {
+                                        color: white;
+                                        background-color: #0577a8;
+                                        border: 2px #DADADA solid;
+                                        padding: 5px 10px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        font-size: 9pt;
+                                    }""")
+        self.btnUserData.setStyleSheet(
+                                    """
+                                        QPushButton:hover{
+                                        border: 2px #000 solid;
+                                        border-radius: 5px;
+                                        background: #21E234;
+                                        }
+                                    """)
+        self.lbNameRegister.setStyleSheet(
+                                    """
+                                        QLabel
+                                        {
+                                            color: white;
+                                            background-color: #0000FF;
+                                            border-style: solid;
+                                            border: 1px solid #3A3939;
+                                            border-radius: 4px;
+                                        }
+                                    """)
+        self.lbAddressRegister.setStyleSheet(
+                                    """
+                                        QLabel
+                                        {
+                                            color: white;
+                                            background-color: #0000FF;
+                                            border-style: solid;
+                                            border: 1px solid #3A3939;
+                                            border-radius: 4px;
+                                        }
+                                    """)
+
+        self.lbCityRegister.setStyleSheet(
+                                    """
+                                        QLabel
+                                        {
+                                            color: white;
+                                            background-color: #0000FF;
+                                            border-style: solid;
+                                            border: 1px solid #3A3939;
+                                            border-radius: 4px;
+                                        }
+                                    """)
+
+        self.lbCountryRegister.setStyleSheet(
+                                    """
+                                        QLabel
+                                        {
+                                            color: white;
+                                            background-color: #0000FF;
+                                            border-style: solid;
+                                            border: 1px solid #3A3939;
+                                            border-radius: 4px;
+                                        }
+                                    """)
+
+        self.textName.setStyleSheet(
+                                    """
+                                        QTextEdit
+                                        {
+                                            border: 1px solid #000;
+                                            border-radius: 3px;
+                                            background-color: #FFFFFF;
+                                        }
+                                    """)
+
+        self.textAddress.setStyleSheet(
+                                    """
+                                        QTextEdit
+                                        {
+                                            border: 1px solid #000;
+                                            border-radius: 3px;
+                                            background-color: #FFFFFF;
+                                        }
+                                    """)
+
+        self.textCity.setStyleSheet(
+                                    """
+                                        QTextEdit
+                                        {
+                                            border: 1px solid #000;
+                                            border-radius: 3px;
+                                            background-color: #FFFFFF;
+                                        }
+                                    """)
+                                    
+        self.textCountry.setStyleSheet(
+                                    """
+                                        QTextEdit
+                                        {
+                                            border: 1px solid #000;
+                                            border-radius: 3px;
+                                            background-color: #FFFFFF;
+                                        }
+                                    """)
+
+        self.textSearchHere.setStyleSheet(
+                                    """
+                                        QTextEdit
+                                        {
+                                            border: 1px solid #000;
+                                            border-radius: 3px;
+                                            background-color: #FFFFFF;
+                                        }
+                                    """)
+
     def registerUserData(self):
         if self.flagConnect: 
             if self.user.mysqlConnection():
+                self.styleSheetRegisterUserDefault()
+                self.clearDisplayData()
+                self.animationLoading()
+
                 # setting multi-media for the display 
-                self.lb_select.setGeometry(-10, 460, 51, 61)
                 self.groupBoxConnection.setVisible(True)
                 self.groupBoxUserData.setVisible(True) 
                 self.groupBoxImageID.setVisible(True)
 
                 self.lbReadingTag.setVisible(False)  
-                self.grapViewImgReadingTag.setVisible(False)
                 self.btnCloseTag.setVisible(False)
-                self.lbLoading.setVisible(False)
 
                 self.radioSearchName.setChecked(True)
-                # self.clearDisplayData()
                 self.displayTable()
 
             else:
@@ -391,7 +864,20 @@ class UI(QWidget):
             msg.setDefaultButton(QMessageBox.Ok)
             x = msg.exec_() # execute the message
 
+    def animationLoading(self):
+        self.movie = QMovie(PATH_IMAGE_TOOLS + '3.jpg')
+        self.lbMovie.setMovie(self.movie)
+
+    # Start Animation
+    def startAnimation(self):
+        self.movie.start()
+
+    # Stop Animation(According to need)
+    def stopAnimation(self):
+        self.movie.stop()
+        
     def scanTagsUserRegister(self):
+        # self.startAnimation()
         # self.lbReadingTag.setVisible(True)  
         # self.grapViewImgReadingTag.setVisible(True)
         # self.btnCloseTag.setVisible(True)
@@ -431,7 +917,6 @@ class UI(QWidget):
 
                 # Disable lable loading
                 self.lbReadingTag.setVisible(False)  
-                self.grapViewImgReadingTag.setVisible(False)
                 self.btnCloseTag.setVisible(False)
                 self.lbLoading.setVisible(False)
 
@@ -571,6 +1056,7 @@ class UI(QWidget):
         self.btnBrowseImage.setIconSize(self.btnBrowseImage.size())
         self.btnBrowseImage.setIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'Click_to_browse.png'))
         self.imagePath = ''
+        self.lbViewRegister.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
 
     def browseImageUserAndTrain(self):
 
@@ -658,11 +1144,6 @@ class UI(QWidget):
 
         # add event when the mouse is click by the admin
         self.tableWidget.viewport().installEventFilter(self)
-
-        # selecting default the row just to init
-        if self.tableWidget.rowCount() > 0:
-            self.tableWidget.selectRow(0)
-            self.displayImageRegister(0)
             
     def updateNumberUser(self):
         # loading  the number of user on database
@@ -700,13 +1181,34 @@ class UI(QWidget):
         self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.jpg'.format(id, dateRegister)))
 
     def creatingListWidget(self):
+        #TODO:
        pass
 
-# =================================================================================================================
+# ================================================================================
+# Control device and warning it if recognition failed
+# ================================================================================
+    def control_led_status(self, led_red_en, led_green_en):
+        ctl_val = 0x01
+        val = 0x00
+        if led_red_en:
+            val |= 0x01
+
+        if led_green_en:
+            val |= 0x02
+
+        
+        if (led_red_en == False) and (led_green_en == False):
+            ctl_val = 0x00
+
+        self.ser.pc_send_data_to_device(RFID_REQ_MSG_ID, [ctl_val, val]) 
+
+
+# ================================================================================
 # Run the UI
-# =================================================================================================================
+# ================================================================================
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+
     # MainWindow = QtWidgets.QMainWindow()
     ui = UI()
     # widget = QtWidgets.QStackedWidget() # to switch the sceens in the case you have many windows 
