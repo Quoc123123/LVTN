@@ -413,18 +413,30 @@
 # sys.exit(App.exec()) 
 
 
-from face_recogniton_knn import *
-import time
+# from face_recogniton_knn import *
+# import time
 
-test = RecognitionUser()
+# test = RecognitionUser()
 
 
 # test.getDataSet('987654321')
 # test.trainingUser()
-a = test.recognitionUser(5)
-print(a)
+# a = test.recognitionUser()
+# print(a)
 # print(type(a[0]))
 # print(type(a[1]))
+# import cv2
+
+# url = 'http://192.168.1.3:4747/video'
+
+# video = cv2.VideoCapture(0)
+
+# while True:
+#     ret, frame = video.read()
+#     if ret == True:
+#         cv2.imshow('IPCam', frame)
+#     if cv2.waitKey(1) == ord('q'):
+#         break
 
 
 # a = 925423848037
@@ -497,13 +509,13 @@ print(a)
 # sendEmailToAdmin()
 
 
-# from face_recogniton_knn import *
+from face_recogniton_knn import *
 
 
-# abc = RecognitionUser()
+abc = RecognitionUser()
 # abc.facial_landmarks('456')
 # abc.trainingUser()
-# print(abc.recognitionUser())
+print(abc.recognitionUser())
 
 
 # import sys

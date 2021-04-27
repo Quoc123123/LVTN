@@ -151,7 +151,7 @@ class RecognitionUser():
         Structure:
             <train_dir>/
             ├── <person1>/
-
+            │   ├── <somename1>.jpeg
             │   ├── <somename2>.jpeg
             │   ├── ...
             ├── <person2>/
@@ -205,7 +205,7 @@ class RecognitionUser():
 
         return knn_clf
 
-    def predict(self, X_img_path, knn_clf=None, model_path=None, distance_threshold=0.3):
+    def predict(self, X_img_path, knn_clf=None, model_path=None, distance_threshold=0.4):
         """
         Recognizes faces in given image using a trained KNN classifier
 
@@ -288,6 +288,7 @@ class RecognitionUser():
         print("Training complete!")
 
     def recognitionUser(self):
+
         # Initialize and start realine video capture
         video_capture = cv2.VideoCapture(0)
         cv2.imshow('Video', np.empty((5,5),dtype=float))
@@ -317,11 +318,11 @@ class RecognitionUser():
                 # Find all people in the image using a trained classifier model
                 # Note: You can pass in either a classifier file name or a classifier model instance
                 predictions = self.predict(full_file_path, model_path=OUTPUT_TRAINING_DIR)
-                if len(predictions) == 0:
-                    print('No faces are found in the image')
-                    video_capture.release()
-                    cv2.destroyAllWindows()
-                    return list((None, 0, None))
+                # if len(predictions) == 0:
+                #     print('No faces are found in the image')
+                #     video_capture.release()
+                #     cv2.destroyAllWindows()
+                #     return list((None, 0, None))
                 # print('predictions', predictions)
 
                 # TODO: Validate return value
