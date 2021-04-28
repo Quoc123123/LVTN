@@ -385,6 +385,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Warning)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'warning.png'))
             x = msg.exec_() # execute the message
 
 # ==================================================================================
@@ -563,6 +564,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
     def recognitionUser(self):
@@ -604,6 +606,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
     def usingTagsecognition(self, timeout):
@@ -617,6 +620,7 @@ class UI(QWidget):
                 msg.setIcon(QMessageBox.Information)
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                 x = msg.exec_() # execute the message
                 break 
 
@@ -655,6 +659,7 @@ class UI(QWidget):
                     msg.setIcon(QMessageBox.Information)
                     msg.setStandardButtons(QMessageBox.Ok)
                     msg.setDefaultButton(QMessageBox.Ok)
+                    msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                     x = msg.exec_() # execute the message
                 break
 
@@ -846,6 +851,7 @@ class UI(QWidget):
                 msg.setIcon(QMessageBox.Information)
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                 x = msg.exec_() # execute the message
             
         else:
@@ -856,6 +862,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
     def animationLoading(self):
@@ -891,6 +898,7 @@ class UI(QWidget):
                 msg.setIcon(QMessageBox.Information)
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                 x = msg.exec_() # execute the message
                 break
 
@@ -924,6 +932,7 @@ class UI(QWidget):
                     msg.setIcon(QMessageBox.Question)
                     msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
                     msg.setDefaultButton(QMessageBox.Ok)
+                    msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                     x = msg.exec_() # execute the message
                     if x == QMessageBox.Ok:
                         self.displayEditUser()
@@ -973,6 +982,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
         
         elif len(self.name) == 0 or len(self.address) == 0 \
@@ -984,6 +994,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
         else:
@@ -995,6 +1006,7 @@ class UI(QWidget):
                 msg.setIcon(QMessageBox.Information)
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                 x = msg.exec_() # execute the message
             else:
                 if not self.flagUpdate:
@@ -1007,6 +1019,7 @@ class UI(QWidget):
                         msg.setIcon(QMessageBox.Information)
                         msg.setStandardButtons(QMessageBox.Ok)
                         msg.setDefaultButton(QMessageBox.Ok)
+                        msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
                         x = msg.exec_() # execute the message
 
                         # Clear data for the next register
@@ -1018,6 +1031,7 @@ class UI(QWidget):
                         msg.setText('Data failed')
                         msg.setInformativeText('Data failed to save')
                         msg.setWindowTitle("Error")
+                        msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'critical.png'))
                         x = msg.exec_()
                 else:
                     # check whether that changes what
@@ -1068,6 +1082,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
         elif len(self.textName.toPlainText()) == 0 or len(self.textAddress.toPlainText()) == 0 \
@@ -1079,6 +1094,7 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
         else:
             # get data user into the file (include image, name, id, ....)
@@ -1095,6 +1111,8 @@ class UI(QWidget):
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
+            x = msg.exec_() # execute the message
 
     def displayTable(self):
         self.updateNumberUser()
@@ -1172,7 +1190,7 @@ class UI(QWidget):
         dateRegister = self.tableWidget.item(row, 5).text()
         print('id: {}, date: {} has been taken from table'.format(id, dateRegister))
         self.lbViewRegister.setScaledContents(True)
-        self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.jpg'.format(id, dateRegister)))
+        self.lbViewRegister.setPixmap(QPixmap('picture/image_save/{}_{}.png'.format(id, dateRegister)))
 
     def creatingListWidget(self):
         #TODO:
