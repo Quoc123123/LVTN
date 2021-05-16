@@ -124,13 +124,15 @@ class RecognitionUser():
                     cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
                 cv2.imshow("Frame", frame)
 
-            # time.sleep(0.2)
+            time.sleep(0.1)
             p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
             if not os.path.exists(p):
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
-            # total += 1
-            # cv2.imwrite(p, faceAligned)
+            
+            if len(rects) > 0:
+                total += 1
+                cv2.imwrite(p, faceAligned)
 
             if total >= 10:
                 break

@@ -190,6 +190,7 @@ class SerialComm:
         self.tx_message.extend(self._header.encode())
         self._payLoad = len(msg_data)
         self.tx_message.extend(self._payLoad.to_bytes(2, byteorder='big')) 
+        self.tx_message.extend(msg_data) 
         self.tx_message.extend(self._footer.encode())   
         # send data to device
         self.ser.write(self.tx_message)

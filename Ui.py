@@ -571,6 +571,7 @@ class UI(QWidget):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)
             msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
+            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
     def recognitionUser(self):
@@ -848,7 +849,6 @@ class UI(QWidget):
             if self.user.mysqlConnection():
                 self.styleSheetRegisterUserDefault()
                 self.clearDisplayData()
-                self.animationLoading()
 
                 # setting multi-media for the display 
                 self.groupBoxConnection.setVisible(True)
@@ -880,17 +880,6 @@ class UI(QWidget):
             msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
 
-    def animationLoading(self):
-        self.movie = QMovie(PATH_IMAGE_TOOLS + '3.jpg')
-        self.lbMovie.setMovie(self.movie)
-
-    # Start Animation
-    def startAnimation(self):
-        self.movie.start()
-
-    # Stop Animation(According to need)
-    def stopAnimation(self):
-        self.movie.stop()
         
     def scanTagsUserRegister(self):
         # self.startAnimation()
@@ -931,11 +920,6 @@ class UI(QWidget):
                 idRaw = self.lbID.text()
                 lenIdRaw = len(idRaw)
                 self.idUser = idRaw[6: lenIdRaw]
-
-                # Disable lable loading
-                self.lbReadingTag.setVisible(False)  
-                self.btnCloseTag.setVisible(False)
-            
 
                 # Check the data exits or not 
                 status = self.user.checkDataUser(self.idUser)
@@ -1121,7 +1105,7 @@ class UI(QWidget):
 
             msg = QMessageBox() 
             msg.setWindowTitle("Information")
-            msg.setText("Get imgae uset successfully!!!")
+            msg.setText("Get image user successfully!!!")
             msg.setIcon(QMessageBox.Information)
             msg.setStandardButtons(QMessageBox.Ok)
             msg.setDefaultButton(QMessageBox.Ok)

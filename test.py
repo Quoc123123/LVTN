@@ -513,9 +513,9 @@ from face_recogniton_knn import *
 
 
 abc = RecognitionUser()
-# abc.facial_landmarks('456')
+abc.facial_landmarks('456')
 # abc.trainingUser()
-print(abc.recognitionUser())
+#print(abc.recognitionUser())
 
 # import cv2
 
@@ -608,9 +608,6 @@ print(abc.recognitionUser())
 # sys.exit(app.exec_())
 
 
-a = 10
-b = 6
 
-print(a / b)
 
 
