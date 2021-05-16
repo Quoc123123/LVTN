@@ -124,13 +124,8 @@ class RecognitionUser():
                     cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
                 cv2.imshow("Frame", frame)
 
-<<<<<<< HEAD
-            time.sleep(0.2)
-            p = os.path.join(INPUT_TRAINING_DIR, ID)
-=======
             # time.sleep(0.2)
             p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
->>>>>>> window_recogniton
             if not os.path.exists(p):
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
@@ -299,12 +294,7 @@ class RecognitionUser():
         classifier = self.train(f'{INPUT_TRAINING_DIR}', model_save_path=OUTPUT_TRAINING_DIR, n_neighbors=2)
         print("Training complete!")
 
-<<<<<<< HEAD
-    def recognitionUser(self):
-
-=======
     def recognitionUser(self, timeout):
->>>>>>> window_recogniton
         # Initialize and start realine video capture
         video_capture = cv2.VideoCapture(0)
         cv2.imshow('Video', np.empty((5,5),dtype=float))
