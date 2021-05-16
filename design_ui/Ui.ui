@@ -279,6 +279,8 @@
      <property name="font">
       <font>
        <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="title">
@@ -609,7 +611,7 @@
       </font>
      </property>
      <property name="title">
-      <string>Image and ID</string>
+      <string/>
      </property>
      <widget class="QLabel" name="lbNameRegister">
       <property name="geometry">
@@ -656,9 +658,6 @@
         <weight>50</weight>
         <bold>false</bold>
        </font>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
        <string>Address</string>
@@ -736,6 +735,8 @@
       <property name="font">
        <font>
         <pointsize>9</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="title">
@@ -754,6 +755,7 @@
         <font>
          <pointsize>9</pointsize>
          <weight>75</weight>
+         <italic>true</italic>
          <bold>true</bold>
         </font>
        </property>
@@ -834,57 +836,6 @@
        </property>
        <property name="scaledContents">
         <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="lbReadingTag">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>120</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Reading Tag...</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnCloseTag">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>120</y>
-         <width>31</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <stylestrategy>PreferDefault</stylestrategy>
-        </font>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../picture/image_tools/iconfinder_Button_Close-01_1221894.png</normaloff>../picture/image_tools/iconfinder_Button_Close-01_1221894.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
        </property>
       </widget>
       <widget class="QLabel" name="lbMovie">

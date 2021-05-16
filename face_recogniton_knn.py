@@ -14,10 +14,13 @@ import recognition.face_recognition as face_recognition
 from recognition.face_recognition.face_recognition_cli import image_files_in_folder
 from user_infor import *
 
+# Using algorithm
+
 # Path for face image database
-INPUT_TRAINING_DIR = 'recognition/dataset/train'
-INPUT_TEST_DIR = 'recognition/dataset/test'
-OUTPUT_TRAINING_DIR = 'recognition/output/trained_knn_model.clf'
+INPUT_TRAINING_DIR      = 'recognition/dataset/train'
+INPUT_TEST_DIR          = 'recognition/dataset/test'
+OUTPUT_TRAINING_DIR     = 'recognition/output/trained_knn_model.clf'
+# OUTPUT_TRAINING_DIR     = 'recognition/output/trainer.yml'
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -25,6 +28,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 class RecognitionUser():
     def __init__(self):
         self.userInfor = UserInfor()
+
     # points are tuples in the form (x,y)
     # returns angle between points in degrees
     def calculate_inclination(self, point1, point2):
@@ -100,8 +104,8 @@ class RecognitionUser():
                 #     (x,y,w,h) = self.get_face_boundbox(shape, i)
                 #     cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 1)
 
-                incl = self.calculate_inclination(shape[17], shape[26])
-                print("Pixels distance points in mouth: ", shape[66][1] - shape[62][1])
+                # incl = self.calculate_inclination(shape[17], shape[26])
+                # print("Pixels distance points in mouth: ", shape[66][1] - shape[62][1])
 
                 # x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
                 (x, y, w, h) = face_utils.rect_to_bb(rect)
@@ -120,13 +124,18 @@ class RecognitionUser():
                     cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
                 cv2.imshow("Frame", frame)
 
+<<<<<<< HEAD
             time.sleep(0.2)
             p = os.path.join(INPUT_TRAINING_DIR, ID)
+=======
+            # time.sleep(0.2)
+            p = os.path.join(f'{INPUT_TRAINING_DIR}', ID)
+>>>>>>> window_recogniton
             if not os.path.exists(p):
                 os.makedirs(p)
             p = os.path.join(p, "{}.png".format(str(total).zfill(5)))
-            total += 1
-            cv2.imwrite(p, faceAligned)
+            # total += 1
+            # cv2.imwrite(p, faceAligned)
 
             if total >= 10:
                 break
@@ -139,6 +148,9 @@ class RecognitionUser():
         video_capture.release()
         cv2.destroyAllWindows()
 
+    #========================================================================================
+    # Uisng KNN algorithm
+    #========================================================================================
 
     def train(self, train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree', verbose=False):
         """
@@ -287,8 +299,12 @@ class RecognitionUser():
         classifier = self.train(f'{INPUT_TRAINING_DIR}', model_save_path=OUTPUT_TRAINING_DIR, n_neighbors=2)
         print("Training complete!")
 
+<<<<<<< HEAD
     def recognitionUser(self):
 
+=======
+    def recognitionUser(self, timeout):
+>>>>>>> window_recogniton
         # Initialize and start realine video capture
         video_capture = cv2.VideoCapture(0)
         cv2.imshow('Video', np.empty((5,5),dtype=float))
@@ -299,8 +315,13 @@ class RecognitionUser():
         flag_check_unknow = True
         check_number_user = 0
         flag_check_user = True
+        
+        start_time = time.time()
 
         while cv2.getWindowProperty('Video', 0) >= 0:
+            if time.time() - start_time > timeout:
+                return list((False, 3, None))
+
             # Capture frame-by-frame
             ret, frame = video_capture.read()
             orig = frame.copy()
@@ -336,16 +357,16 @@ class RecognitionUser():
                 # Display results overlaid on an image
                 pil_image = Image.open(full_file_path).convert("RGB")
                 draw = ImageDraw.Draw(pil_image)
-
                 for name, (top, right, bottom, left) in predictions:
                     # print("- Found {} at ({}, {})".format(name, left, top))
                     if flag_check_unknow:
                         if name == 'unknow':
                             check_number_unknow += 1
+                            flag_check_unknow = True
                         else:
                             flag_check_unknow == False
                         
-                    if flag_check_unknow and check_number_unknow >= 1:
+                    if flag_check_unknow and check_number_unknow >= 3:
                         print('Unknow user')
                         video_capture.release()
                         cv2.destroyAllWindows()
@@ -366,7 +387,7 @@ class RecognitionUser():
                     
                     check_number_user += 1
                     print('recognized user: {} - {}'.format(str(name), check_number_user))
-                    if check_number_user >= 5:
+                    if check_number_user >= 3:
                         video_capture.release()
                         cv2.destroyAllWindows()
                         return list((True, 1, str(name)))
@@ -378,6 +399,38 @@ class RecognitionUser():
 
         video_capture.release()
         cv2.destroyAllWindows()
+
+
+    # #========================================================================================
+    # # Uisng haarcascade algorithm
+    # #========================================================================================
+    # def train(self, train_dir, model_save_path):
+    #     recognizer = cv2.face.LBPHFaceRecognizer_create()
+    #     detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+    #     imagePaths = [os.path.join(train_dir,f) for f in os.listdir(train_dir)] 
+    #     faceSamples=[]
+    #     ids = []
+        
+    #     for imagePath in imagePaths:
+    #         PIL_img = Image.open(imagePath).convert('L')
+    #         img_numpy = np.array(PIL_img,'uint8')
+    #         id = int(os.path.split(imagePath)[-1].split(".")[1])
+    #         print(id)
+    #         faces = detector.detectMultiScale(img_numpy)
+    #         for (x,y,w,h) in faces:
+    #             faceSamples.append(img_numpy[y:y+h,x:x+w])
+    #             ids.append(id)
+
+    #     recognizer.train(faceSamples, np.array(ids))
+    #     recognizer.save(model_save_path)
+
+
+    # def trainingUser(self):
+    #     # STEP 1: Train the KNN classifier and save it to disk
+    #     # Once the model is trained and saved, you can skip this step next time.
+    #     print("Training haarCascade classifier...")
+    #     classifier = self.train(f'{INPUT_TRAINING_DIR}', model_save_path=OUTPUT_TRAINING_DIR)
+    #     print("Training complete!")
 
 class FaceAligner():
     def __init__(self, predictor, desiredLeftEye=(0.35, 0.35), desiredFaceWidth=256, desiredFaceHeight=None):
