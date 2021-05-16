@@ -1068,57 +1068,6 @@
     <string>Registration / Edit User Data</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnCloseTag">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>630</y>
-     <width>31</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <stylestrategy>PreferDefault</stylestrategy>
-    </font>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../picture/image_tools/iconfinder_Button_Close-01_1221894.png</normaloff>../picture/image_tools/iconfinder_Button_Close-01_1221894.png</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>20</width>
-     <height>20</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbReadingTag">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>600</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Reading Tag...</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

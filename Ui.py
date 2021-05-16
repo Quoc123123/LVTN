@@ -574,11 +574,35 @@ class UI(QWidget):
             self.usingFaceRecognition()
     
     def usingFaceRecognition(self):
-        ret = self.faceRecognition.recognitionUser()
+        ret = self.faceRecognition.recognitionUser(20)
+        # clear display previous user 
+        self.clearDataUser()
         if not ret[0]:
-            self.control_led_status(True, False)
-            #TODO: Display on ui which was failed
-            return 
+            if(ret[1] == 3):
+                # process timeout
+                print('Face recogniton received  timeout')
+                msg = QMessageBox() 
+                msg.setWindowTitle("information")
+                msg.setText("recognition  timeout!!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
+                x = msg.exec_() # execute the message
+
+            elif(ret[1] == 2):
+                # send command to notify this user dsoesn't recognition
+                self.control_led_status(True, False)
+
+                # Display the message user doesn't register yet
+                msg = QMessageBox() 
+                msg.setWindowTitle("information")
+                msg.setText("User doesn't exits, please register!!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setDefaultButton(QMessageBox.Ok)
+                msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
+                x = msg.exec_() # execute the message
         id = ret[2]
         if self.user.checkDataUser(id) == mysql_query_status['USER_EXIST']:
             ls = self.user.getDataUser(id)
@@ -595,19 +619,6 @@ class UI(QWidget):
 
             # send command to notify this user was recognized
             self.control_led_status(False, True)
-        else:
-            # send command to notify this user doesn't recognition
-            self.control_led_status(True, False)
-
-            # Display the message user doesn't register yet
-            msg = QMessageBox() 
-            msg.setWindowTitle("information")
-            msg.setText("User doesn't exits, please register!!")
-            msg.setIcon(QMessageBox.Information)
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.setDefaultButton(QMessageBox.Ok)
-            msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
-            x = msg.exec_() # execute the message
 
     def usingTagsecognition(self, timeout):
         start_time = time.time()
@@ -627,6 +638,7 @@ class UI(QWidget):
             checkData, receiveData = self.ser.get_data_from_device()
             
             if checkData > 0:
+                self.clearDataUser()
                 print('DEBUG: {}'.format(receiveData))
                 # Processing receive data
                 self.dataDisplay = ''
@@ -670,7 +682,7 @@ class UI(QWidget):
         self.lbDisplayCountry.setText('Waiting...')
         self.lbIDUserData.setText('ID :_______________________')
         self.lbViewUser.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
-        # Turn off lee status
+        # Turn off led status
         self.control_led_status(False, False)
         
         
@@ -836,9 +848,6 @@ class UI(QWidget):
                 self.groupBoxConnection.setVisible(True)
                 self.groupBoxUserData.setVisible(True) 
                 self.groupBoxImageID.setVisible(True)
-
-                self.lbReadingTag.setVisible(False)  
-                self.btnCloseTag.setVisible(False)
 
                 self.radioSearchName.setChecked(True)
                 self.displayTable()
@@ -1067,13 +1076,6 @@ class UI(QWidget):
         self.lbViewRegister.setPixmap(QPixmap(PATH_IMAGE_TOOLS + 'user.png'))
 
     def browseImageUserAndTrain(self):
-
-        # Choose the image file for the user data
-        filename = QFileDialog.getOpenFileName()
-        self.imagePath = filename[0]
-        print('image path'.format(self.imagePath))
-        # self.imagePath = os.path.split(imagePath)[-1]
-
         if self.lbID.text() == 'ID    _________':
             print("Not eligible for registration because the id user yet scan") 
             msg = QMessageBox() 
@@ -1097,6 +1099,12 @@ class UI(QWidget):
             msg.setWindowIcon(QtGui.QIcon(PATH_IMAGE_TOOLS + 'error.png'))
             x = msg.exec_() # execute the message
         else:
+            # Choose the image file for the user data
+            filename = QFileDialog.getOpenFileName()
+            self.imagePath = filename[0]
+            print('image path'.format(self.imagePath))
+            # self.imagePath = os.path.split(imagePath)[-1]
+
             # get data user into the file (include image, name, id, ....)
             self.faceRecognition.facial_landmarks(self.idUser)
             self.faceRecognition.trainingUser()
