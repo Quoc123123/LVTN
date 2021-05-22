@@ -14,7 +14,8 @@ from face_recogniton_knn import *
 listPort = []
 listBaudRate = [1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200]
 
-TIME_WATTING_READING = 5
+TIME_WATTING_READING = 10
+RECOGNIZE_TIMEOUT = 50
 
 PATH_IMAGE_USER = 'picture/image_user/'
 PATH_IMAGE_TOOLS = 'picture/image_tools/'
@@ -581,7 +582,7 @@ class UI(QWidget):
             self.usingFaceRecognition()
     
     def usingFaceRecognition(self):
-        ret = self.faceRecognition.recognitionUser(20)
+        ret = self.faceRecognition.recognitionUser(RECOGNIZE_TIMEOUT)
         # clear display previous user 
         self.clearDataUser()
         if not ret[0]:

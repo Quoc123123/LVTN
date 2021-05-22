@@ -371,8 +371,7 @@ class RecognitionUser():
                     text_width, text_height = draw.textsize(name)
                 
                     cv2.rectangle(frame, (left, bottom - text_height - 10), (right, bottom), (255, 0, 0), -1)
-                    # infor = self.userInfor.getDataUser(str(name))
-                    # print('User recognized: ', infor)
+        
                     cv2.putText(frame, str(name), (left + 6, bottom - text_height - 12), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     # Show infor user
                     cv2.imshow('Video', frame)
